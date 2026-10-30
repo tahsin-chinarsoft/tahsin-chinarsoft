@@ -19,7 +19,6 @@ Each folder holds one sketch (Arduino needs the folder and the `.ino` file to sh
 | 8 | [IR Inspection Station](E08_IRStation/) | obstacle, line and flame sensors | — | [E08_IRStation_Task](E08_IRStation/E08_IRStation_Task/) | coming soon |
 | 9 | [IR Remote Cloner](E09_IRCloner/) | IR receiver, IR LED, HX1838 remote | IRremote | [E09_IRCloner_Task](E09_IRCloner/E09_IRCloner_Task/) | coming soon |
 | 10 | [Machine Menu](E10_MenuController/) | rotary encoder, joystick, touch sensor | — | [E10_MenuController_Task](E10_MenuController/E10_MenuController_Task/) | coming soon |
-| 11 | [Pulse Sensor](E11_PulseSensor/) | KY-039 heartbeat sensor | — | [E11_PulseSensor_Task](E11_PulseSensor/E11_PulseSensor_Task/) | coming soon |
 | 12 | [Smart Lamp](E12_SmartLamp/) | relay module + clap, light and door sensors | — | [E12_SmartLamp_Task](E12_SmartLamp/E12_SmartLamp_Task/) | coming soon |
 | 13 | [Keypad Lock](E13_KeypadLock/) | 4x3 keypad, EEPROM PIN, relay | Keypad | [E13_KeypadLock_Task](E13_KeypadLock/E13_KeypadLock_Task/) | coming soon |
 | 14 | [LCD Thermostat](E14_LCDThermostat/) | LCD keypad shield + DS18B20 + relay | OneWire, DallasTemperature | [E14_LCDThermostat_Task](E14_LCDThermostat/E14_LCDThermostat_Task/) | coming soon |
