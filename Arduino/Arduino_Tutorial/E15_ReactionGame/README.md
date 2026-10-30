@@ -28,3 +28,9 @@ Shield pinout (fixed, typical):
   Set the shield's voltage switch to 5V for the Uno.
 On-board LED D13 lights at "GO".
 ```
+
+## Homework solution
+
+The "Your task" from the end of this episode, solved in full: [`E15_ReactionGame_Task/E15_ReactionGame_Task.ino`](E15_ReactionGame_Task/E15_ReactionGame_Task.ino)
+
+Same wiring as the main sketch unless the file header says otherwise.

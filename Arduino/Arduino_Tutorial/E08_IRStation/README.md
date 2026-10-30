@@ -29,3 +29,9 @@ Wiring (Arduino Uno):
   Two-color LED     R -> D5, G -> D6 (220 ohm)
   Active buzzer     S -> D12
 ```
+
+## Homework solution
+
+The "Your task" from the end of this episode, solved in full: [`E08_IRStation_Task/E08_IRStation_Task.ino`](E08_IRStation_Task/E08_IRStation_Task.ino)
+
+Same wiring as the main sketch unless the file header says otherwise.

@@ -6,29 +6,29 @@ Each folder holds one sketch (Arduino needs the folder and the `.ino` file to sh
 
 ## Episodes
 
-| # | Episode | Topic | Extra libraries | Video |
-| --- | --- | --- | --- | --- |
-| 0 | [Arduino Basics](E00_Blink/) | the board, digital vs analog, the IDE and your first Blink | — | coming soon |
-| 1 | [Smart Doorbell](E01_Doorbell/) | button + active vs passive buzzer | — | coming soon |
-| 2 | [Mood Lamp](E02_MoodLamp/) | RGB, two-colour and 7-colour LED modules | — | coming soon |
-| 3 | [Secret Knock Lock](E03_SecretKnock/) | tilt, vibration and tap switches | — | coming soon |
-| 4 | [Magnet Lab](E04_MagnetLab/) | reed switches and Hall sensors | — | coming soon |
-| 5 | [Laser Tripwire](E05_LaserTripwire/) | laser, photoresistor, light barrier, magic cup | — | coming soon |
-| 6 | [Temperature Shoot-out](E06_TempShootout/) | NTC vs DS18B20 vs DHT11 | OneWire, DallasTemperature, DHT_sensor_library + Adafruit_Unified_Sensor | coming soon |
-| 7 | [Clap Switch](E07_ClapSwitch/) | KY-037 vs KY-038 microphones | — | coming soon |
-| 8 | [IR Inspection Station](E08_IRStation/) | obstacle, line and flame sensors | — | coming soon |
-| 9 | [IR Remote Cloner](E09_IRCloner/) | IR receiver, IR LED, HX1838 remote | IRremote | coming soon |
-| 10 | [Machine Menu](E10_MenuController/) | rotary encoder, joystick, touch sensor | — | coming soon |
-| 11 | [Pulse Sensor](E11_PulseSensor/) | KY-039 heartbeat sensor | — | coming soon |
-| 12 | [Smart Lamp](E12_SmartLamp/) | relay module + clap, light and door sensors | — | coming soon |
-| 13 | [Keypad Lock](E13_KeypadLock/) | 4x3 keypad, EEPROM PIN, relay | Keypad | coming soon |
-| 14 | [LCD Thermostat](E14_LCDThermostat/) | LCD keypad shield + DS18B20 + relay | OneWire, DallasTemperature | coming soon |
-| 15 | [Reaction Game](E15_ReactionGame/) | joystick shield | — | coming soon |
-| 16 | [Data Logger](E16_DataLogger/) | SD card module, CSV logging | OneWire, DallasTemperature, DHT_sensor_library + Adafruit_Unified_Sensor | coming soon |
-| 17 | [Gas Sensors](E17_GasSensors/) | MQ-3, MQ-4, MQ-7, MQ-135 | — | coming soon |
-| 18 | [Parking Assistant](E18_ParkingAssistant/) | HC-SR04 with temperature correction | OneWire, DallasTemperature | coming soon |
-| 19 | [WiFi Motors](E19_WiFiMotors/) | NodeMCU motor shield, phone control | — | coming soon |
-| 20 | [WiFi Dashboard](E20_WiFiDashboard/) | NodeMCU live sensor dashboard | OneWire, DallasTemperature | coming soon |
+| # | Episode | Topic | Extra libraries | Homework solution | Video |
+| --- | --- | --- | --- | --- | --- |
+| 0 | [Arduino Basics](E00_Blink/) | the board, digital vs analog, the IDE and your first Blink | — | [E00_Blink_Task](E00_Blink/E00_Blink_Task/) | coming soon |
+| 1 | [Smart Doorbell](E01_Doorbell/) | button + active vs passive buzzer | — | [E01_Doorbell_Task](E01_Doorbell/E01_Doorbell_Task/) | coming soon |
+| 2 | [Mood Lamp](E02_MoodLamp/) | RGB, two-colour and 7-colour LED modules | — | [E02_MoodLamp_Task](E02_MoodLamp/E02_MoodLamp_Task/) | coming soon |
+| 3 | [Secret Knock Lock](E03_SecretKnock/) | tilt, vibration and tap switches | — | [E03_SecretKnock_Task](E03_SecretKnock/E03_SecretKnock_Task/) | coming soon |
+| 4 | [Magnet Lab](E04_MagnetLab/) | reed switches and Hall sensors | — | [E04_MagnetLab_Task](E04_MagnetLab/E04_MagnetLab_Task/) | coming soon |
+| 5 | [Laser Tripwire](E05_LaserTripwire/) | laser, photoresistor, light barrier, magic cup | — | [E05_LaserTripwire_Task](E05_LaserTripwire/E05_LaserTripwire_Task/) | coming soon |
+| 6 | [Temperature Shoot-out](E06_TempShootout/) | NTC vs DS18B20 vs DHT11 | OneWire, DallasTemperature, DHT_sensor_library + Adafruit_Unified_Sensor | [E06_TempShootout_Task](E06_TempShootout/E06_TempShootout_Task/) | coming soon |
+| 7 | [Clap Switch](E07_ClapSwitch/) | KY-037 vs KY-038 microphones | — | [E07_ClapSwitch_Task](E07_ClapSwitch/E07_ClapSwitch_Task/) | coming soon |
+| 8 | [IR Inspection Station](E08_IRStation/) | obstacle, line and flame sensors | — | [E08_IRStation_Task](E08_IRStation/E08_IRStation_Task/) | coming soon |
+| 9 | [IR Remote Cloner](E09_IRCloner/) | IR receiver, IR LED, HX1838 remote | IRremote | [E09_IRCloner_Task](E09_IRCloner/E09_IRCloner_Task/) | coming soon |
+| 10 | [Machine Menu](E10_MenuController/) | rotary encoder, joystick, touch sensor | — | [E10_MenuController_Task](E10_MenuController/E10_MenuController_Task/) | coming soon |
+| 11 | [Pulse Sensor](E11_PulseSensor/) | KY-039 heartbeat sensor | — | [E11_PulseSensor_Task](E11_PulseSensor/E11_PulseSensor_Task/) | coming soon |
+| 12 | [Smart Lamp](E12_SmartLamp/) | relay module + clap, light and door sensors | — | [E12_SmartLamp_Task](E12_SmartLamp/E12_SmartLamp_Task/) | coming soon |
+| 13 | [Keypad Lock](E13_KeypadLock/) | 4x3 keypad, EEPROM PIN, relay | Keypad | [E13_KeypadLock_Task](E13_KeypadLock/E13_KeypadLock_Task/) | coming soon |
+| 14 | [LCD Thermostat](E14_LCDThermostat/) | LCD keypad shield + DS18B20 + relay | OneWire, DallasTemperature | [E14_LCDThermostat_Task](E14_LCDThermostat/E14_LCDThermostat_Task/) | coming soon |
+| 15 | [Reaction Game](E15_ReactionGame/) | joystick shield | — | [E15_ReactionGame_Task](E15_ReactionGame/E15_ReactionGame_Task/) | coming soon |
+| 16 | [Data Logger](E16_DataLogger/) | SD card module, CSV logging | OneWire, DallasTemperature, DHT_sensor_library + Adafruit_Unified_Sensor | [E16_DataLogger_Task](E16_DataLogger/E16_DataLogger_Task/) | coming soon |
+| 17 | [Gas Sensors](E17_GasSensors/) | MQ-3, MQ-4, MQ-7, MQ-135 | — | [E17_GasSensors_Task](E17_GasSensors/E17_GasSensors_Task/) | coming soon |
+| 18 | [Parking Assistant](E18_ParkingAssistant/) | HC-SR04 with temperature correction | OneWire, DallasTemperature | [E18_ParkingAssistant_Task](E18_ParkingAssistant/E18_ParkingAssistant_Task/) | coming soon |
+| 19 | [WiFi Motors](E19_WiFiMotors/) | NodeMCU motor shield, phone control | — | [E19_WiFiMotors_Task](E19_WiFiMotors/E19_WiFiMotors_Task/) | coming soon |
+| 20 | [WiFi Dashboard](E20_WiFiDashboard/) | NodeMCU live sensor dashboard | OneWire, DallasTemperature | [E20_WiFiDashboard_Task](E20_WiFiDashboard/E20_WiFiDashboard_Task/) | coming soon |
 
 Episodes 0–18 run on an **Arduino Uno**. Episodes 19–20 run on a **NodeMCU 1.0 (ESP-12E)**.
 

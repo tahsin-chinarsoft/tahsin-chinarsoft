@@ -29,3 +29,9 @@ Extra wiring on the shield's free headers:
 Buttons: UP/DOWN change value, LEFT/RIGHT change page, SELECT = manual override on/off
 Libraries: LiquidCrystal (built in), OneWire, DallasTemperature
 ```
+
+## Homework solution
+
+The "Your task" from the end of this episode, solved in full: [`E14_LCDThermostat_Task/E14_LCDThermostat_Task.ino`](E14_LCDThermostat_Task/E14_LCDThermostat_Task.ino)
+
+Same wiring as the main sketch unless the file header says otherwise.

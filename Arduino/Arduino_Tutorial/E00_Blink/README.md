@@ -25,3 +25,9 @@ Change BLINK_MODE and upload again to try each version:
   2 = blink without delay() using millis()  (the Arduino stays free to do other work)
 Open the Serial Monitor at 9600 baud to see what the board is doing.
 ```
+
+## Homework solution
+
+The "Your task" from the end of this episode, solved in full: [`E00_Blink_Task/E00_Blink_Task.ino`](E00_Blink_Task/E00_Blink_Task.ino)
+
+Same wiring as the main sketch unless the file header says otherwise.

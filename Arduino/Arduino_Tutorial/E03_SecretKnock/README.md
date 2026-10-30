@@ -30,3 +30,9 @@ Wiring (Arduino Uno):
 
 Serial: 'L' = learn a new knock pattern, 'T' = print tilt switch states
 ```
+
+## Homework solution
+
+The "Your task" from the end of this episode, solved in full: [`E03_SecretKnock_Task/E03_SecretKnock_Task.ino`](E03_SecretKnock_Task/E03_SecretKnock_Task.ino)
+
+Same wiring as the main sketch unless the file header says otherwise.

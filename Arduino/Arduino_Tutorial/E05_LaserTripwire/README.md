@@ -29,3 +29,9 @@ Wiring (Arduino Uno):
   KY-027 magic cup L -> D9 (PWM LED) | S -> D4 (tilt) | + -> 5V | G -> GND
   Active buzzer    S -> D12 | - -> GND
 ```
+
+## Homework solution
+
+The "Your task" from the end of this episode, solved in full: [`E05_LaserTripwire_Task/E05_LaserTripwire_Task.ino`](E05_LaserTripwire_Task/E05_LaserTripwire_Task.ino)
+
+Same wiring as the main sketch unless the file header says otherwise.

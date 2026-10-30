@@ -34,3 +34,9 @@ Wiring (Arduino Uno):
 Card: FAT16/FAT32, max 32 GB, file names 8.3 format (LOG007.CSV)
 Libraries: SD (built in), OneWire, DallasTemperature, DHT sensor library
 ```
+
+## Homework solution
+
+The "Your task" from the end of this episode, solved in full: [`E16_DataLogger_Task/E16_DataLogger_Task.ino`](E16_DataLogger_Task/E16_DataLogger_Task.ino)
+
+Same wiring as the main sketch unless the file header says otherwise.

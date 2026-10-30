@@ -31,3 +31,9 @@ Wiring (Arduino Uno), keypad pins from left to right with keys facing you:
 
 Library: Keypad (Mark Stanley, Alexander Brevig)
 ```
+
+## Homework solution
+
+The "Your task" from the end of this episode, solved in full: [`E13_KeypadLock_Task/E13_KeypadLock_Task.ino`](E13_KeypadLock_Task/E13_KeypadLock_Task.ino)
+
+Same wiring as the main sketch unless the file header says otherwise.

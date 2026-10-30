@@ -27,3 +27,9 @@ Short press : "ding-dong" on the passive buzzer
 Long press  : (> 1 s) urgent beeps on the active buzzer
 No library needed.
 ```
+
+## Homework solution
+
+The "Your task" from the end of this episode, solved in full: [`E01_Doorbell_Task/E01_Doorbell_Task.ino`](E01_Doorbell_Task/E01_Doorbell_Task.ino)
+
+Same wiring as the main sketch unless the file header says otherwise.
