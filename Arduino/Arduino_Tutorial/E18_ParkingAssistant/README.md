@@ -29,3 +29,9 @@ Wiring (Arduino Uno):
   DS18B20 (KY-001) S -> D4
 Libraries: OneWire, DallasTemperature
 ```
+
+## Homework solution
+
+The "Your task" from the end of this episode, solved in full: [`E18_ParkingAssistant_Task/E18_ParkingAssistant_Task.ino`](E18_ParkingAssistant_Task/E18_ParkingAssistant_Task.ino)
+
+Same wiring as the main sketch unless the file header says otherwise.

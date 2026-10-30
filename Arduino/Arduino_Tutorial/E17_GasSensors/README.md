@@ -33,3 +33,9 @@ Wiring (Arduino Uno):
 Serial (115200): 'c' = calibrate in clean air (saves R0 to EEPROM)
 Output: ratio Rs/R0 per sensor. 1.00 = clean air, lower = more gas.
 ```
+
+## Homework solution
+
+The "Your task" from the end of this episode, solved in full: [`E17_GasSensors_Task/E17_GasSensors_Task.ino`](E17_GasSensors_Task/E17_GasSensors_Task.ino)
+
+Same wiring as the main sketch unless the file header says otherwise.

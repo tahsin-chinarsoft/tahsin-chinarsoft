@@ -32,3 +32,9 @@ Wiring:
   KY-021 reed       S -> D6 (GPIO12) | - -> GND   (internal pull-up used)
 Libraries: OneWire, DallasTemperature (+ ESP8266 core libraries)
 ```
+
+## Homework solution
+
+The "Your task" from the end of this episode, solved in full: [`E20_WiFiDashboard_Task/E20_WiFiDashboard_Task.ino`](E20_WiFiDashboard_Task/E20_WiFiDashboard_Task.ino)
+
+Same wiring as the main sketch unless the file header says otherwise.

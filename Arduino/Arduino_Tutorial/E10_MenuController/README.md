@@ -27,3 +27,9 @@ Wiring (Arduino Uno):
   KY-023 joystick  VRx -> A0 | VRy -> A1 | SW -> D4 | +5V -> 5V | GND -> GND
   KY-036 touch     AO -> A2  | DO -> D6 | + -> 5V | G -> GND
 ```
+
+## Homework solution
+
+The "Your task" from the end of this episode, solved in full: [`E10_MenuController_Task/E10_MenuController_Task.ino`](E10_MenuController_Task/E10_MenuController_Task.ino)
+
+Same wiring as the main sketch unless the file header says otherwise.

@@ -26,3 +26,9 @@ Wiring (Arduino Uno):
 
 Serial Plotter at 115200: "big:<p2p> small:<p2p> threshold:<value>"
 ```
+
+## Homework solution
+
+The "Your task" from the end of this episode, solved in full: [`E07_ClapSwitch_Task/E07_ClapSwitch_Task.ino`](E07_ClapSwitch_Task/E07_ClapSwitch_Task.ino)
+
+Same wiring as the main sketch unless the file header says otherwise.

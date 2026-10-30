@@ -29,3 +29,9 @@ Serial commands (9600 baud):
   m = mood mode (slow rainbow)    r/g/b/w = fixed color    0 = off
   f = toggle 7-color flash LED
 ```
+
+## Homework solution
+
+The "Your task" from the end of this episode, solved in full: [`E02_MoodLamp_Task/E02_MoodLamp_Task.ino`](E02_MoodLamp_Task/E02_MoodLamp_Task.ino)
+
+Same wiring as the main sketch unless the file header says otherwise.

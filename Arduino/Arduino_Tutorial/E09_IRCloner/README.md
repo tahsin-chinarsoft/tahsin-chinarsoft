@@ -31,3 +31,9 @@ Wiring (Arduino Uno):
 
 Library: IRremote (Armin Joachimsmeyer) v4.x
 ```
+
+## Homework solution
+
+The "Your task" from the end of this episode, solved in full: [`E09_IRCloner_Task/E09_IRCloner_Task.ino`](E09_IRCloner_Task/E09_IRCloner_Task.ino)
+
+Same wiring as the main sketch unless the file header says otherwise.

@@ -29,3 +29,9 @@ Shield pins (fixed by the shield):
 Power: motors from VM terminal (4.5-9 V battery), keep the VIN/VM jumper as your shield's manual says.
        Never power motors from the USB port.
 ```
+
+## Homework solution
+
+The "Your task" from the end of this episode, solved in full: [`E19_WiFiMotors_Task/E19_WiFiMotors_Task.ino`](E19_WiFiMotors_Task/E19_WiFiMotors_Task.ino)
+
+Same wiring as the main sketch unless the file header says otherwise.

@@ -27,3 +27,9 @@ Use: put a fingertip gently between the IR LED and the sensor, keep still,
      shade it from room light (a piece of black tape or a clothes peg helps).
 Serial Plotter at 115200: "pulse:<filtered> bpm:<value>"
 ```
+
+## Homework solution
+
+The "Your task" from the end of this episode, solved in full: [`E11_PulseSensor_Task/E11_PulseSensor_Task.ino`](E11_PulseSensor_Task/E11_PulseSensor_Task.ino)
+
+Same wiring as the main sketch unless the file header says otherwise.

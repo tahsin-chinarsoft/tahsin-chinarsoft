@@ -29,3 +29,9 @@ Wiring (Arduino Uno):
 Libraries: OneWire, DallasTemperature, DHT sensor library (Adafruit) + Adafruit Unified Sensor
 Output: Serial Plotter at 115200 baud
 ```
+
+## Homework solution
+
+The "Your task" from the end of this episode, solved in full: [`E06_TempShootout_Task/E06_TempShootout_Task.ino`](E06_TempShootout_Task/E06_TempShootout_Task.ino)
+
+Same wiring as the main sketch unless the file header says otherwise.
