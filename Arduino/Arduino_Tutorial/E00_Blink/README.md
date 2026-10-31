@@ -1,6 +1,8 @@
 # Episode 0 · Arduino Basics
 _The board, digital vs analog, the IDE and your first Blink_
 
+▶ **Watch the video:** https://youtu.be/TOcCXtMF8Q0
+
 **Video:** coming soon
 
 **Board:** Arduino Uno  
