@@ -4,7 +4,8 @@
   for(let i=0;i<30 && document.querySelector('ytd-watch-flexy')?.getAttribute('video-id')!==id;i++) await S(500);
   document.querySelector('video')?.pause();
   let ph=null;
-  for(let i=0;i<25 && !ph;i++){ const c=document.querySelector('ytd-comments#comments'); if(c){ window.scrollTo(0,c.getBoundingClientRect().top+window.scrollY-200);} await S(700); ph=document.querySelector('ytd-comments #simplebox-placeholder'); }
+  for(let i=0;i<40 && !ph;i++){ const c=document.querySelector('ytd-comments#comments'); const top=c?c.getBoundingClientRect().top+window.scrollY:0; if(i%4===3){window.scrollTo(0,0);} else if(top>300){window.scrollTo(0,top-200);} else {window.scrollBy(0,600);} await S(800); ph=document.querySelector('ytd-comments #simplebox-placeholder'); }
+  if(ph) ph.scrollIntoView({block:'center'});
   if(!ph) return id+': no-comment-box';
   await S(2000);
   const threads=()=>[...document.querySelectorAll('ytd-comments ytd-comment-thread-renderer')];
