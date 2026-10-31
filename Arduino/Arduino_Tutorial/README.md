@@ -8,7 +8,7 @@ Each folder holds one sketch (Arduino needs the folder and the `.ino` file to sh
 
 | # | Episode | Topic | Extra libraries | Homework solution | Video |
 | --- | --- | --- | --- | --- | --- |
-| 0 | [Arduino Basics](E00_Blink/) | the board, digital vs analog, the IDE and your first Blink | — | [E00_Blink_Task](E00_Blink/E00_Blink_Task/) | coming soon |
+| 0 | [Arduino Basics](E00_Blink/) | the board, digital vs analog, the IDE and your first Blink | — | [E00_Blink_Task](E00_Blink/E00_Blink_Task/) | [▶ Watch](https://youtu.be/TOcCXtMF8Q0) |
 | 1 | [Smart Doorbell](E01_Doorbell/) | button + active vs passive buzzer | — | [E01_Doorbell_Task](E01_Doorbell/E01_Doorbell_Task/) | coming soon |
 | 2 | [Mood Lamp](E02_MoodLamp/) | RGB, two-colour and 7-colour LED modules | — | [E02_MoodLamp_Task](E02_MoodLamp/E02_MoodLamp_Task/) | coming soon |
 | 3 | [Secret Knock Lock](E03_SecretKnock/) | tilt, vibration and tap switches | — | [E03_SecretKnock_Task](E03_SecretKnock/E03_SecretKnock_Task/) | coming soon |
