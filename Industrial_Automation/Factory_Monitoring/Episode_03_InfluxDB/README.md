@@ -49,7 +49,7 @@ stops,line=packaging,type=unplanned,state=IDLE,reason=material\ shortage minutes
 ## Ask questions with SQL
 
 ```sql
-SELECT bucket, SUM(dt) / 60 AS minutes
+SELECT bucket, SUM(dt) / 60.0 AS minutes
 FROM machine WHERE time > now() - INTERVAL '8 hours' GROUP BY bucket;
 
 SELECT type, reason, COUNT(*) AS stops, SUM(minutes) AS minutes
@@ -57,7 +57,7 @@ FROM stops WHERE time > now() - INTERVAL '8 hours' GROUP BY type, reason ORDER B
 ```
 
 ```bash
-influxdb3 query --database factory --token <TOKEN> "SELECT bucket, SUM(dt)/60 AS minutes FROM machine GROUP BY bucket"
+influxdb3 query --database factory --token <TOKEN> "SELECT bucket, SUM(dt)/60.0 AS minutes FROM machine GROUP BY bucket"
 ```
 
 ## How the restart works
