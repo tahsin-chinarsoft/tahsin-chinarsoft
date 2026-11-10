@@ -1,0 +1,622 @@
+[
+ {
+  "id": "fm030000",
+  "type": "tab",
+  "label": "Factory Monitoring \u2013 Ep 3",
+  "disabled": false,
+  "info": "ChinarSoft \u00b7 Build a Factory Monitoring System from Scratch \u00b7 Episode 3\nEpisode 2 flow + InfluxDB 3 Core: every reading and every stop is stored; totals survive a restart.\nSet env INFLUX_TOKEN (and INFLUX_URL if not http://127.0.0.1:8181)."
+ },
+ {
+  "id": "fm030010",
+  "type": "comment",
+  "z": "fm030000",
+  "name": "Start the machine first: python3 machine_sim.py --seed 7 --speed 60",
+  "info": "",
+  "x": 300,
+  "y": 40,
+  "wires": []
+ },
+ {
+  "id": "fm030001",
+  "type": "modbus-client",
+  "name": "ChinarSoft virtual machine",
+  "clienttype": "tcp",
+  "bufferCommands": true,
+  "stateLogEnabled": false,
+  "queueLogEnabled": false,
+  "failureLogEnabled": true,
+  "tcpHost": "127.0.0.1",
+  "tcpPort": "5020",
+  "tcpType": "DEFAULT",
+  "serialPort": "/dev/ttyUSB",
+  "serialType": "RTU-BUFFERD",
+  "serialBaudrate": "9600",
+  "serialDatabits": "8",
+  "serialStopbits": "1",
+  "serialParity": "none",
+  "serialConnectionDelay": "100",
+  "serialAsciiResponseStartDelimiter": "0x3A",
+  "unit_id": "1",
+  "commandDelay": "1",
+  "clientTimeout": "1000",
+  "reconnectOnTimeout": true,
+  "reconnectTimeout": "2000",
+  "parallelUnitIdsAllowed": true,
+  "showErrors": false,
+  "showWarnings": true,
+  "showLogs": true
+ },
+ {
+  "id": "fm030002",
+  "type": "modbus-read",
+  "z": "fm030000",
+  "name": "Read machine (HR 0\u201311, 1 s)",
+  "topic": "machine",
+  "showStatusActivities": true,
+  "logIOActivities": false,
+  "showErrors": true,
+  "showWarnings": true,
+  "unitid": "1",
+  "dataType": "HoldingRegister",
+  "adr": "0",
+  "quantity": "12",
+  "rate": "1",
+  "rateUnit": "s",
+  "delayOnStart": false,
+  "startDelayTime": "",
+  "server": "fm030001",
+  "useIOFile": false,
+  "ioFile": "",
+  "useIOForPayload": false,
+  "emptyMsgOnFail": false,
+  "x": 170,
+  "y": 120,
+  "wires": [
+   [
+    "fm030003"
+   ],
+   []
+  ]
+ },
+ {
+  "id": "fm030003",
+  "type": "function",
+  "z": "fm030000",
+  "name": "Decode registers",
+  "func": "// Holding registers 0..11 from the ChinarSoft virtual machine -> one object\nconst r = msg.payload;\nconst STATES  = ['STOPPED', 'RUNNING', 'IDLE', 'FAULT', 'CHANGEOVER', 'PLANNED_STOP'];\nconst REASONS = ['-', 'material shortage', 'jam', 'motor overload', 'sensor fault',\n                 'changeover', 'break/meal', 'planned maintenance'];\n\nmsg.payload = {\n    state:      STATES[r[0]] ?? `UNKNOWN(${r[0]})`,\n    reason:     REASONS[r[1]] ?? String(r[1]),\n    good:       r[2] * 65536 + r[3],      // 32-bit counter, high word first\n    scrap:      r[4] * 65536 + r[5],\n    idealCycle: r[6] / 10,                // seconds\n    cycle:      r[7] / 10,                // seconds\n    product:    r[8],\n    temp:       r[9] / 10,                // degC\n    heartbeat:  r[10],                    // +1 per machine second\n    inState:    r[11]                     // machine seconds in current state\n};\nreturn msg;\n",
+  "outputs": 1,
+  "timeout": 0,
+  "noerr": 0,
+  "initialize": "",
+  "finalize": "",
+  "libs": [],
+  "x": 400,
+  "y": 120,
+  "wires": [
+   [
+    "fm030004"
+   ]
+  ]
+ },
+ {
+  "id": "fm030004",
+  "type": "function",
+  "z": "fm030000",
+  "name": "Detect stops",
+  "func": "// Detects every state change and turns each finished stop into one record.\n// Time comes from the machine's own heartbeat (+1 per machine second),\n// so durations stay correct at any simulator --speed.\nconst p = msg.payload;\nconst PLANNED = ['CHANGEOVER', 'PLANNED_STOP'];\nconst bucket = s => s === 'RUNNING' ? 'run' : PLANNED.includes(s) ? 'planned' : 'unplanned';\n\nlet last   = context.get('last');\nlet clock  = context.get('clock')  || 0;                    // machine seconds\nlet totals = context.get('totals') || { run: 0, planned: 0, unplanned: 0 };\nlet log    = context.get('log')    || [];\n\nconst add = {};                                             // machine seconds per bucket in this reading\nconst credit = (b, sec) => { totals[b] += sec; add[b] = (add[b] || 0) + sec; };\nif (!last) {                                                // first reading\n    const r = flow.get('restore');                          // what InfluxDB already knew\n    if (r === undefined) return null;                       // wait until the restore query answered\n    clock = p.heartbeat;\n    last  = { state: p.state, reason: p.reason, since: clock - p.inState };\n    if (r && r.heartbeat !== undefined) {                   // Node-RED restarted mid-shift\n        totals = { ...totals, ...r.totals };\n        log    = r.log;\n        const gap  = (p.heartbeat - r.heartbeat + 65536) % 65536;   // machine seconds we missed\n        const here = Math.min(gap, p.inState);              // current state: the machine tells us\n        credit(bucket(p.state), here);\n        // the rest of the gap: the part counter tells us how much of it was running\n        let parts = (p.good + p.scrap) - r.parts;\n        if (p.state === 'RUNNING') parts -= here / p.cycle;\n        const rest = gap - here;\n        const run  = Math.min(rest, Math.max(0, parts) * r.cycle);\n        if (run > 0) credit('run', Math.round(run));\n        const left = rest - Math.round(run);                // stopped, but we didn't see why\n        if (left > 0) credit(r.bucket === 'run' ? 'unplanned' : r.bucket, left);\n    } else {                                                // fresh start\n        credit(bucket(p.state), p.inState);\n    }\n} else {\n    const dt = (p.heartbeat - last.hb + 65536) % 65536;     // heartbeat wraps at 65535\n    clock += dt;\n    credit(bucket(last.state), dt);\n}\n\nconst hhmm = s => String(Math.floor(s / 3600)).padStart(2, '0') + ':' +\n                  String(Math.floor(s / 60) % 60).padStart(2, '0');\nlet stop = null;\n\nif (p.state !== last.state) {\n    if (last.state !== 'RUNNING') {                          // a stop just ended\n        stop = { payload: {\n            start:   hhmm(last.since),\n            end:     hhmm(clock),\n            minutes: Math.round((clock - last.since) / 6) / 10,\n            state:   last.state,\n            reason:  last.reason,\n            type:    bucket(last.state)\n        }};\n        log = [stop.payload, ...log].slice(0, 50);           // newest first\n    }\n    last = { state: p.state, reason: p.reason, since: clock };\n}\nlast.hb = p.heartbeat;\n\ncontext.set('last', last);\ncontext.set('clock', clock);\ncontext.set('totals', totals);\ncontext.set('log', log);\n\nconst live = { payload: { ...p, clock: hhmm(clock), add, totals: {\n    run:       Math.round(totals.run / 60),\n    planned:   Math.round(totals.planned / 60),\n    unplanned: Math.round(totals.unplanned / 60)\n}}};\nreturn [live, stop, stop ? { payload: log } : null];\n",
+  "outputs": 3,
+  "timeout": 0,
+  "noerr": 0,
+  "initialize": "",
+  "finalize": "",
+  "libs": [],
+  "outputLabels": [
+   "live status",
+   "finished stop",
+   "stop log (newest first)"
+  ],
+  "x": 600,
+  "y": 120,
+  "wires": [
+   [
+    "fm03000d",
+    "fm030011"
+   ],
+   [
+    "fm030005",
+    "fm030007",
+    "fm030012"
+   ],
+   [
+    "fm03000e"
+   ]
+  ]
+ },
+ {
+  "id": "fm030005",
+  "type": "function",
+  "z": "fm030000",
+  "name": "To CSV line",
+  "func": "// One CSV line per stop; writes the header once when the file is new.\nconst s = msg.payload;\nconst file = env.get('STOPS_FILE') || 'stops.csv';\nlet line = [s.start, s.end, s.minutes, s.state, s.reason, s.type].join(',');\nif (!fs.existsSync(file)) line = 'start,end,minutes,state,reason,type\\n' + line;\nmsg.filename = file;\nmsg.payload = line;\nreturn msg;\n",
+  "outputs": 1,
+  "timeout": 0,
+  "noerr": 0,
+  "initialize": "",
+  "finalize": "",
+  "libs": [
+   {
+    "var": "fs",
+    "module": "fs"
+   }
+  ],
+  "x": 830,
+  "y": 220,
+  "wires": [
+   [
+    "fm030006"
+   ]
+  ]
+ },
+ {
+  "id": "fm030006",
+  "type": "file",
+  "z": "fm030000",
+  "name": "Append to stops.csv",
+  "filename": "filename",
+  "filenameType": "msg",
+  "appendNewline": true,
+  "createDir": true,
+  "overwriteFile": "false",
+  "encoding": "utf8",
+  "x": 1050,
+  "y": 220,
+  "wires": [
+   []
+  ]
+ },
+ {
+  "id": "fm030007",
+  "type": "debug",
+  "z": "fm030000",
+  "name": "Stop log",
+  "active": true,
+  "tosidebar": true,
+  "console": false,
+  "tostatus": true,
+  "complete": "payload",
+  "targetType": "msg",
+  "statusVal": "payload.reason",
+  "statusType": "msg",
+  "x": 820,
+  "y": 280,
+  "wires": []
+ },
+ {
+  "id": "fm030008",
+  "type": "ui-base",
+  "name": "ChinarSoft",
+  "path": "/dashboard",
+  "appIcon": "",
+  "includeClientData": true,
+  "acceptsClientConfig": [
+   "ui-notification",
+   "ui-control"
+  ],
+  "showPathInSidebar": false,
+  "headerContent": "page",
+  "navigationStyle": "none",
+  "titleBarStyle": "default",
+  "showReconnectNotification": true,
+  "notificationDisplayTime": 1,
+  "showDisconnectNotification": true,
+  "allowInstall": false
+ },
+ {
+  "id": "fm030009",
+  "type": "ui-theme",
+  "name": "ChinarSoft dark",
+  "colors": {
+   "surface": "#121417",
+   "primary": "#F28C28",
+   "bgPage": "#121417",
+   "groupBg": "#16191D",
+   "groupOutline": "#2A2F36"
+  },
+  "sizes": {
+   "density": "default",
+   "pagePadding": "16px",
+   "groupGap": "16px",
+   "groupBorderRadius": "12px",
+   "widgetGap": "12px"
+  }
+ },
+ {
+  "id": "fm03000a",
+  "type": "ui-page",
+  "name": "Packaging machine \u2013 live",
+  "ui": "fm030008",
+  "path": "/machine",
+  "icon": "factory",
+  "layout": "grid",
+  "theme": "fm030009",
+  "breakpoints": [
+   {
+    "name": "Default",
+    "px": "0",
+    "cols": "3"
+   },
+   {
+    "name": "Tablet",
+    "px": "576",
+    "cols": "6"
+   },
+   {
+    "name": "Small Desktop",
+    "px": "768",
+    "cols": "9"
+   },
+   {
+    "name": "Desktop",
+    "px": "1024",
+    "cols": "12"
+   }
+  ],
+  "order": 1,
+  "className": "",
+  "visible": "true",
+  "disabled": "false"
+ },
+ {
+  "id": "fm03000b",
+  "type": "ui-group",
+  "name": "Machine status",
+  "page": "fm03000a",
+  "width": "12",
+  "height": "1",
+  "order": 1,
+  "showTitle": true,
+  "className": "",
+  "visible": "true",
+  "disabled": "false",
+  "groupType": "default"
+ },
+ {
+  "id": "fm03000c",
+  "type": "ui-group",
+  "name": "Stop log (machine time)",
+  "page": "fm03000a",
+  "width": "12",
+  "height": "1",
+  "order": 3,
+  "showTitle": true,
+  "className": "",
+  "visible": "true",
+  "disabled": "false",
+  "groupType": "default"
+ },
+ {
+  "id": "fm03000d",
+  "type": "ui-template",
+  "z": "fm030000",
+  "group": "fm03000b",
+  "page": "",
+  "ui": "",
+  "name": "Status card",
+  "order": 1,
+  "width": "12",
+  "height": "5",
+  "head": "",
+  "format": "<template>\n  <div class=\"m\" v-if=\"msg && msg.payload\">\n    <div class=\"top\">\n      <div class=\"state\" :style=\"{ background: color }\">{{ msg.payload.state }}</div>\n      <div class=\"reason\">{{ msg.payload.reason === '-' ? '' : msg.payload.reason }}</div>\n      <div class=\"clock\">machine time {{ msg.payload.clock }}</div>\n    </div>\n    <div class=\"row\">\n      <div class=\"kpi\"><span>GOOD</span><b>{{ fmt(msg.payload.good) }}</b></div>\n      <div class=\"kpi\"><span>SCRAP</span><b class=\"bad\">{{ fmt(msg.payload.scrap) }}</b></div>\n      <div class=\"kpi\"><span>CYCLE</span><b>{{ msg.payload.cycle.toFixed(1) }} s</b></div>\n      <div class=\"kpi\"><span>MOTOR</span><b>{{ msg.payload.temp.toFixed(1) }} \u00b0C</b></div>\n    </div>\n    <div class=\"bar\">\n      <div class=\"seg run\" :style=\"{ flex: msg.payload.totals.run || 0.0001 }\"></div>\n      <div class=\"seg pl\" :style=\"{ flex: msg.payload.totals.planned }\"></div>\n      <div class=\"seg un\" :style=\"{ flex: msg.payload.totals.unplanned }\"></div>\n    </div>\n    <div class=\"legend\">\n      <span><i class=\"run\"></i>Running {{ msg.payload.totals.run }} min</span>\n      <span><i class=\"pl\"></i>Planned stops {{ msg.payload.totals.planned }} min</span>\n      <span><i class=\"un\"></i>Unplanned stops {{ msg.payload.totals.unplanned }} min</span>\n    </div>\n  </div>\n  <div v-else class=\"wait\">Waiting for the machine\u2026</div>\n</template>\n\n<script>\nexport default {\n  methods: { fmt(n) { return Number(n).toLocaleString('en-US') } },\n  computed: {\n    color() {\n      const s = this.msg?.payload?.state\n      if (s === 'RUNNING') return '#2E9E6A'\n      if (s === 'CHANGEOVER' || s === 'PLANNED_STOP') return '#5C6675'\n      if (s === 'IDLE') return '#C9861C'\n      return '#D0393F'\n    }\n  }\n}\n</script>\n\n<style scoped>\n.m { font-family: Inter, system-ui, sans-serif; color: #F2EFE9; padding: 8px 4px; }\n.top { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }\n.state { font-size: 34px; font-weight: 800; letter-spacing: 1px; padding: 8px 18px; border-radius: 10px; }\n.reason { font-size: 24px; color: #F5B342; }\n.clock { margin-left: auto; font-family: 'JetBrains Mono', monospace; color: #A8B0BA; font-size: 18px; }\n.row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 18px 0; }\n.kpi { background: #1B1F24; border-radius: 10px; padding: 12px 14px; display: flex; flex-direction: column; gap: 4px; }\n.kpi span { font-size: 13px; letter-spacing: 2px; color: #A8B0BA; font-weight: 700; }\n.kpi b { font-size: 30px; font-family: 'JetBrains Mono', monospace; }\n.kpi b.bad { color: #E5484D; }\n.bar { display: flex; height: 22px; border-radius: 6px; overflow: hidden; background: #1B1F24; }\n.seg.run, i.run { background: #2E9E6A; } .seg.pl, i.pl { background: #5C6675; } .seg.un, i.un { background: #D0393F; }\n.legend { display: flex; gap: 22px; margin-top: 10px; font-size: 16px; color: #C9CED6; flex-wrap: wrap; }\n.legend i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }\n.wait { color: #A8B0BA; font-size: 20px; padding: 20px; }\n</style>\n",
+  "storeOutMessages": true,
+  "passthru": false,
+  "resendOnRefresh": true,
+  "templateScope": "local",
+  "className": "",
+  "x": 830,
+  "y": 100,
+  "wires": [
+   []
+  ]
+ },
+ {
+  "id": "fm03000e",
+  "type": "ui-table",
+  "z": "fm030000",
+  "group": "fm03000c",
+  "name": "Stop log",
+  "label": "",
+  "order": 1,
+  "width": "12",
+  "height": "8",
+  "maxrows": "6",
+  "passthru": false,
+  "autocols": false,
+  "showSearch": false,
+  "deselect": true,
+  "selectionType": "none",
+  "columns": [
+   {
+    "title": "Start",
+    "key": "start",
+    "keyType": "key",
+    "type": "text",
+    "width": "",
+    "align": "start"
+   },
+   {
+    "title": "End",
+    "key": "end",
+    "keyType": "key",
+    "type": "text",
+    "width": "",
+    "align": "start"
+   },
+   {
+    "title": "Minutes",
+    "key": "minutes",
+    "keyType": "key",
+    "type": "text",
+    "width": "",
+    "align": "end"
+   },
+   {
+    "title": "State",
+    "key": "state",
+    "keyType": "key",
+    "type": "text",
+    "width": "",
+    "align": "start"
+   },
+   {
+    "title": "Reason",
+    "key": "reason",
+    "keyType": "key",
+    "type": "text",
+    "width": "",
+    "align": "start"
+   },
+   {
+    "title": "Type",
+    "key": "type",
+    "keyType": "key",
+    "type": "text",
+    "width": "",
+    "align": "start"
+   }
+  ],
+  "mobileBreakpoint": "sm",
+  "mobileBreakpointType": "defaults",
+  "action": "replace",
+  "className": "",
+  "x": 820,
+  "y": 160,
+  "wires": [
+   []
+  ]
+ },
+ {
+  "id": "fm03001a",
+  "type": "comment",
+  "z": "fm030000",
+  "name": "InfluxDB 3 Core: influxdb3 serve \u2026 \u00b7 token in env INFLUX_TOKEN",
+  "info": "",
+  "x": 300,
+  "y": 360,
+  "wires": []
+ },
+ {
+  "id": "fm030011",
+  "type": "function",
+  "z": "fm030000",
+  "name": "Reading \u2192 line protocol",
+  "func": "// Every reading -> InfluxDB line protocol:  measurement,tags fields timestamp\n// dt = machine seconds since the last reading, tagged with the bucket they belong to\nconst p = msg.payload;\nconst ts = Date.now();\nconst lines = Object.entries(p.add).map(([bucket, dt]) =>\n    `machine,line=packaging,bucket=${bucket} ` +\n    `state=\"${p.state}\",reason=\"${p.reason}\",good=${p.good}i,scrap=${p.scrap}i,` +\n    `cycle=${p.cycle},temp=${p.temp},dt=${dt}i,heartbeat=${p.heartbeat}i ${ts}`);\nif (!lines.length) return null;\nmsg.payload = lines.join('\\n');\nreturn msg;\n",
+  "outputs": 1,
+  "timeout": 0,
+  "noerr": 0,
+  "initialize": "",
+  "finalize": "",
+  "libs": [],
+  "x": 870,
+  "y": 420,
+  "wires": [
+   [
+    "fm030013"
+   ]
+  ]
+ },
+ {
+  "id": "fm030012",
+  "type": "function",
+  "z": "fm030000",
+  "name": "Stop \u2192 line protocol",
+  "func": "// Every finished stop -> one line in the 'stops' table\nconst s = msg.payload;\nconst esc = t => String(t).replace(/[ ,=]/g, m => '\\\\' + m);\nmsg.payload =\n    `stops,line=packaging,type=${s.type},state=${s.state},reason=${esc(s.reason)} ` +\n    `minutes=${s.minutes},started=\"${s.start}\",ended=\"${s.end}\" ` +\n    Date.now();\nreturn msg;\n",
+  "outputs": 1,
+  "timeout": 0,
+  "noerr": 0,
+  "initialize": "",
+  "finalize": "",
+  "libs": [],
+  "x": 860,
+  "y": 480,
+  "wires": [
+   [
+    "fm030013"
+   ]
+  ]
+ },
+ {
+  "id": "fm030013",
+  "type": "function",
+  "z": "fm030000",
+  "name": "InfluxDB write request",
+  "func": "// POST line protocol to InfluxDB 3 Core\nmsg.method  = 'POST';\nmsg.url     = `${env.get('INFLUX_URL') || 'http://127.0.0.1:8181'}/api/v3/write_lp?db=factory&precision=ms`;\nmsg.headers = { 'Authorization': 'Bearer ' + env.get('INFLUX_TOKEN'), 'Content-Type': 'text/plain' };\nreturn msg;\n",
+  "outputs": 1,
+  "timeout": 0,
+  "noerr": 0,
+  "initialize": "",
+  "finalize": "",
+  "libs": [],
+  "x": 1110,
+  "y": 450,
+  "wires": [
+   [
+    "fm030014"
+   ]
+  ]
+ },
+ {
+  "id": "fm030014",
+  "type": "http request",
+  "z": "fm030000",
+  "name": "Write to InfluxDB",
+  "method": "use",
+  "ret": "txt",
+  "paytoqs": "ignore",
+  "url": "",
+  "tls": "",
+  "persist": true,
+  "proxy": "",
+  "insecureHTTPParser": false,
+  "authType": "",
+  "senderr": false,
+  "headers": [],
+  "x": 1330,
+  "y": 450,
+  "wires": [
+   [
+    "fm030015"
+   ]
+  ]
+ },
+ {
+  "id": "fm030015",
+  "type": "switch",
+  "z": "fm030000",
+  "name": "write failed?",
+  "property": "statusCode",
+  "propertyType": "msg",
+  "rules": [
+   {
+    "t": "gte",
+    "v": "300",
+    "vt": "num"
+   }
+  ],
+  "checkall": "true",
+  "repair": false,
+  "outputs": 1,
+  "x": 1520,
+  "y": 450,
+  "wires": [
+   [
+    "fm03000f"
+   ]
+  ]
+ },
+ {
+  "id": "fm03000f",
+  "type": "debug",
+  "z": "fm030000",
+  "name": "InfluxDB errors",
+  "active": true,
+  "tosidebar": true,
+  "console": false,
+  "tostatus": true,
+  "complete": "payload",
+  "targetType": "msg",
+  "statusVal": "statusCode",
+  "statusType": "msg",
+  "x": 1700,
+  "y": 450,
+  "wires": []
+ },
+ {
+  "id": "fm030016",
+  "type": "inject",
+  "z": "fm030000",
+  "name": "On start",
+  "props": [],
+  "repeat": "",
+  "crontab": "",
+  "once": true,
+  "onceDelay": "0.1",
+  "topic": "",
+  "x": 140,
+  "y": 560,
+  "wires": [
+   [
+    "fm030017"
+   ]
+  ]
+ },
+ {
+  "id": "fm030017",
+  "type": "function",
+  "z": "fm030000",
+  "name": "What does InfluxDB know?",
+  "func": "// On start: ask InfluxDB what it already knows about this shift (last 8 hours)\nconst base = env.get('INFLUX_URL') || 'http://127.0.0.1:8181';\nconst headers = { 'Authorization': 'Bearer ' + env.get('INFLUX_TOKEN'), 'Content-Type': 'application/json' };\nconst q = sql => ({ method: 'POST', url: `${base}/api/v3/query_sql`, headers,\n                    payload: { db: 'factory', q: sql, format: 'json' } });\nflow.set('restore', undefined);\nreturn [\n  { ...q(`SELECT bucket, SUM(dt) AS seconds FROM machine\n           WHERE time > now() - INTERVAL '8 hours' GROUP BY bucket`), topic: 'totals' },\n  { ...q(`SELECT bucket, heartbeat, good, scrap, cycle FROM machine\n           WHERE time > now() - INTERVAL '8 hours' ORDER BY time DESC LIMIT 1`), topic: 'last' },\n  { ...q(`SELECT started, ended, minutes, state, reason, type FROM stops\n           WHERE time > now() - INTERVAL '8 hours' ORDER BY time DESC LIMIT 50`), topic: 'log' }\n];\n",
+  "outputs": 3,
+  "timeout": 0,
+  "noerr": 0,
+  "initialize": "",
+  "finalize": "",
+  "libs": [],
+  "x": 360,
+  "y": 560,
+  "wires": [
+   [
+    "fm030018"
+   ],
+   [
+    "fm030018"
+   ],
+   [
+    "fm030018"
+   ]
+  ]
+ },
+ {
+  "id": "fm030018",
+  "type": "http request",
+  "z": "fm030000",
+  "name": "Query InfluxDB (SQL)",
+  "method": "use",
+  "ret": "obj",
+  "paytoqs": "ignore",
+  "url": "",
+  "tls": "",
+  "persist": true,
+  "proxy": "",
+  "insecureHTTPParser": false,
+  "authType": "",
+  "senderr": false,
+  "headers": [],
+  "x": 600,
+  "y": 560,
+  "wires": [
+   [
+    "fm030019"
+   ]
+  ]
+ },
+ {
+  "id": "fm030019",
+  "type": "function",
+  "z": "fm030000",
+  "name": "Restore totals + stop log",
+  "func": "// Collect the three answers, then hand them to 'Detect stops'\nconst got = context.get('got') || {};\nconst ok  = msg.statusCode === 200 && Array.isArray(msg.payload);\ngot[msg.topic] = ok ? msg.payload : [];\nif (!ok) node.warn(`InfluxDB ${msg.topic}: ${msg.statusCode} \u2013 starting from zero`);\nif (Object.keys(got).length < 3) { context.set('got', got); return null; }\ncontext.set('got', {});\n\nif (!got.last.length) {                                   // nothing stored yet\n    flow.set('restore', false);           // false = nothing to restore (null would delete the key)\n    node.status({ fill: 'grey', shape: 'dot', text: 'fresh start' });\n    return null;\n}\nconst totals = { run: 0, planned: 0, unplanned: 0 };\ngot.totals.forEach(r => totals[r.bucket] = Number(r.seconds));\nconst log = got.log.map(r => ({ start: r.started, end: r.ended, minutes: r.minutes,\n                                state: r.state, reason: r.reason, type: r.type }));\nconst L = got.last[0];\nflow.set('restore', { totals, log, heartbeat: Number(L.heartbeat), bucket: L.bucket,\n                      parts: Number(L.good) + Number(L.scrap), cycle: Number(L.cycle) || 2 });\nnode.status({ fill: 'green', shape: 'dot',\n              text: `restored ${Math.round((totals.run + totals.planned + totals.unplanned) / 60)} min, ${log.length} stops` });\nreturn { payload: log };\n",
+  "outputs": 1,
+  "timeout": 0,
+  "noerr": 0,
+  "initialize": "",
+  "finalize": "",
+  "libs": [],
+  "x": 830,
+  "y": 560,
+  "wires": [
+   [
+    "fm03000e"
+   ]
+  ]
+ }
+]
