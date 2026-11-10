@@ -10,5 +10,6 @@ Playlist: https://www.youtube.com/@chinarsoft
 | 1 | [Why Your OEE Numbers Are Lying](https://youtu.be/hhvWb7x-EDg) — OEE by hand, planned vs unplanned downtime | uses the virtual machine only |
 | 2 | [Catch Every Machine Stop Live with Node-RED](https://youtu.be/onaTXnidQwo) — Modbus TCP, live dashboard, CSV | [Episode_02_NodeRED](Episode_02_NodeRED) |
 | 3 | [Node-RED Restarted. My Downtime Totals Didn't Reset](https://youtu.be/c35AnljQmC4) — InfluxDB 3 Core, every reading stored | [Episode_03_InfluxDB](Episode_03_InfluxDB) |
-| 4 | Grafana: a live OEE dashboard from SQL | [Episode_04_Grafana](Episode_04_Grafana) |
-| 5 | Downtime reasons from the operator | coming soon |
+| 4 | [My OEE Dashboard Calculates Itself](https://youtu.be/naU2jr2Qz2Y) — Grafana + InfluxDB 3, OEE in one SQL query | [Episode_04_Grafana](Episode_04_Grafana) |
+| 5 | Downtime reasons from the operator — a one-tap tablet page, answers in the same InfluxDB row | [Episode_05_Operator_Reasons](Episode_05_Operator_Reasons) |
+| 6 | Shift report and alerts | coming soon |
