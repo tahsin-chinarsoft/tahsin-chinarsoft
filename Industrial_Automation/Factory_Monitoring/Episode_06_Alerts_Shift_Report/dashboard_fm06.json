@@ -1,0 +1,891 @@
+{
+ "__inputs": [
+  {
+   "name": "DS_INFLUX",
+   "label": "InfluxDB (SQL)",
+   "type": "datasource",
+   "pluginId": "influxdb",
+   "pluginName": "InfluxDB"
+  }
+ ],
+ "title": "Factory Monitoring \u2013 OEE, reasons, alerts + shift report (Episode 6)",
+ "uid": "fm06-oee",
+ "tags": [
+  "factory-monitoring",
+  "oee",
+  "operator",
+  "alerts",
+  "chinarsoft"
+ ],
+ "timezone": "browser",
+ "editable": true,
+ "graphTooltip": 1,
+ "refresh": "5s",
+ "time": {
+  "from": "now-10m",
+  "to": "now"
+ },
+ "schemaVersion": 41,
+ "panels": [
+  {
+   "type": "gauge",
+   "title": "OEE",
+   "targets": [
+    {
+     "refId": "A",
+     "datasource": {
+      "type": "influxdb",
+      "uid": "${DS_INFLUX}"
+     },
+     "rawSql": "SELECT\n  run_s / (run_s + unplanned_s)                          AS availability,\n  2.0 * parts / run_s                                AS performance,\n  good / parts                                           AS quality,\n  run_s / (run_s + unplanned_s) * 2.0 * parts / run_s * good / parts AS oee\nFROM (\n  SELECT\n    SUM(CASE WHEN bucket = 'run'       THEN dt ELSE 0 END) * 1.0 AS run_s,\n    SUM(CASE WHEN bucket = 'unplanned' THEN dt ELSE 0 END) * 1.0 AS unplanned_s,\n    (MAX(good) - MIN(good) + MAX(scrap) - MIN(scrap)) * 1.0      AS parts,\n    (MAX(good) - MIN(good)) * 1.0                                AS good\n  FROM machine\n  WHERE $__timeFilter(time)\n)",
+     "rawQuery": true,
+     "format": "table",
+     "dataset": "iox",
+     "table": "",
+     "sql": {}
+    }
+   ],
+   "fieldConfig": {
+    "defaults": {
+     "unit": "percentunit",
+     "decimals": 1,
+     "min": 0,
+     "max": 1,
+     "thresholds": {
+      "mode": "absolute",
+      "steps": [
+       {
+        "color": "#E5484D",
+        "value": null
+       },
+       {
+        "color": "#F28C28",
+        "value": 0.6
+       },
+       {
+        "color": "#3FB97E",
+        "value": 0.85
+       }
+      ]
+     }
+    },
+    "overrides": []
+   },
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ],
+     "fields": "/^oee$/",
+     "values": false
+    },
+    "showThresholdMarkers": true,
+    "showThresholdLabels": false,
+    "minVizHeight": 75,
+    "minVizWidth": 75
+   },
+   "id": 1,
+   "gridPos": {
+    "x": 0,
+    "y": 0,
+    "w": 6,
+    "h": 7
+   },
+   "datasource": {
+    "type": "influxdb",
+    "uid": "${DS_INFLUX}"
+   }
+  },
+  {
+   "type": "stat",
+   "title": "Availability",
+   "targets": [
+    {
+     "refId": "A",
+     "datasource": {
+      "type": "influxdb",
+      "uid": "${DS_INFLUX}"
+     },
+     "rawSql": "SELECT\n  run_s / (run_s + unplanned_s)                          AS availability,\n  2.0 * parts / run_s                                AS performance,\n  good / parts                                           AS quality,\n  run_s / (run_s + unplanned_s) * 2.0 * parts / run_s * good / parts AS oee\nFROM (\n  SELECT\n    SUM(CASE WHEN bucket = 'run'       THEN dt ELSE 0 END) * 1.0 AS run_s,\n    SUM(CASE WHEN bucket = 'unplanned' THEN dt ELSE 0 END) * 1.0 AS unplanned_s,\n    (MAX(good) - MIN(good) + MAX(scrap) - MIN(scrap)) * 1.0      AS parts,\n    (MAX(good) - MIN(good)) * 1.0                                AS good\n  FROM machine\n  WHERE $__timeFilter(time)\n)",
+     "rawQuery": true,
+     "format": "table",
+     "dataset": "iox",
+     "table": "",
+     "sql": {}
+    }
+   ],
+   "fieldConfig": {
+    "defaults": {
+     "unit": "percentunit",
+     "decimals": 1,
+     "thresholds": {
+      "mode": "absolute",
+      "steps": [
+       {
+        "color": "#E5484D",
+        "value": null
+       },
+       {
+        "color": "#F28C28",
+        "value": 0.6
+       },
+       {
+        "color": "#3FB97E",
+        "value": 0.85
+       }
+      ]
+     },
+     "color": {
+      "mode": "thresholds"
+     }
+    },
+    "overrides": []
+   },
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ],
+     "fields": "/^availability$/",
+     "values": false
+    },
+    "colorMode": "value",
+    "graphMode": "none",
+    "textMode": "value",
+    "justifyMode": "center",
+    "orientation": "auto"
+   },
+   "id": 2,
+   "gridPos": {
+    "x": 6,
+    "y": 0,
+    "w": 6,
+    "h": 7
+   },
+   "datasource": {
+    "type": "influxdb",
+    "uid": "${DS_INFLUX}"
+   }
+  },
+  {
+   "type": "stat",
+   "title": "Performance",
+   "targets": [
+    {
+     "refId": "A",
+     "datasource": {
+      "type": "influxdb",
+      "uid": "${DS_INFLUX}"
+     },
+     "rawSql": "SELECT\n  run_s / (run_s + unplanned_s)                          AS availability,\n  2.0 * parts / run_s                                AS performance,\n  good / parts                                           AS quality,\n  run_s / (run_s + unplanned_s) * 2.0 * parts / run_s * good / parts AS oee\nFROM (\n  SELECT\n    SUM(CASE WHEN bucket = 'run'       THEN dt ELSE 0 END) * 1.0 AS run_s,\n    SUM(CASE WHEN bucket = 'unplanned' THEN dt ELSE 0 END) * 1.0 AS unplanned_s,\n    (MAX(good) - MIN(good) + MAX(scrap) - MIN(scrap)) * 1.0      AS parts,\n    (MAX(good) - MIN(good)) * 1.0                                AS good\n  FROM machine\n  WHERE $__timeFilter(time)\n)",
+     "rawQuery": true,
+     "format": "table",
+     "dataset": "iox",
+     "table": "",
+     "sql": {}
+    }
+   ],
+   "fieldConfig": {
+    "defaults": {
+     "unit": "percentunit",
+     "decimals": 1,
+     "thresholds": {
+      "mode": "absolute",
+      "steps": [
+       {
+        "color": "#E5484D",
+        "value": null
+       },
+       {
+        "color": "#F28C28",
+        "value": 0.6
+       },
+       {
+        "color": "#3FB97E",
+        "value": 0.85
+       }
+      ]
+     },
+     "color": {
+      "mode": "thresholds"
+     }
+    },
+    "overrides": []
+   },
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ],
+     "fields": "/^performance$/",
+     "values": false
+    },
+    "colorMode": "value",
+    "graphMode": "none",
+    "textMode": "value",
+    "justifyMode": "center",
+    "orientation": "auto"
+   },
+   "id": 3,
+   "gridPos": {
+    "x": 12,
+    "y": 0,
+    "w": 6,
+    "h": 7
+   },
+   "datasource": {
+    "type": "influxdb",
+    "uid": "${DS_INFLUX}"
+   }
+  },
+  {
+   "type": "stat",
+   "title": "Quality",
+   "targets": [
+    {
+     "refId": "A",
+     "datasource": {
+      "type": "influxdb",
+      "uid": "${DS_INFLUX}"
+     },
+     "rawSql": "SELECT\n  run_s / (run_s + unplanned_s)                          AS availability,\n  2.0 * parts / run_s                                AS performance,\n  good / parts                                           AS quality,\n  run_s / (run_s + unplanned_s) * 2.0 * parts / run_s * good / parts AS oee\nFROM (\n  SELECT\n    SUM(CASE WHEN bucket = 'run'       THEN dt ELSE 0 END) * 1.0 AS run_s,\n    SUM(CASE WHEN bucket = 'unplanned' THEN dt ELSE 0 END) * 1.0 AS unplanned_s,\n    (MAX(good) - MIN(good) + MAX(scrap) - MIN(scrap)) * 1.0      AS parts,\n    (MAX(good) - MIN(good)) * 1.0                                AS good\n  FROM machine\n  WHERE $__timeFilter(time)\n)",
+     "rawQuery": true,
+     "format": "table",
+     "dataset": "iox",
+     "table": "",
+     "sql": {}
+    }
+   ],
+   "fieldConfig": {
+    "defaults": {
+     "unit": "percentunit",
+     "decimals": 1,
+     "thresholds": {
+      "mode": "absolute",
+      "steps": [
+       {
+        "color": "#E5484D",
+        "value": null
+       },
+       {
+        "color": "#F28C28",
+        "value": 0.6
+       },
+       {
+        "color": "#3FB97E",
+        "value": 0.85
+       }
+      ]
+     },
+     "color": {
+      "mode": "thresholds"
+     }
+    },
+    "overrides": []
+   },
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ],
+     "fields": "/^quality$/",
+     "values": false
+    },
+    "colorMode": "value",
+    "graphMode": "none",
+    "textMode": "value",
+    "justifyMode": "center",
+    "orientation": "auto"
+   },
+   "id": 4,
+   "gridPos": {
+    "x": 18,
+    "y": 0,
+    "w": 6,
+    "h": 7
+   },
+   "datasource": {
+    "type": "influxdb",
+    "uid": "${DS_INFLUX}"
+   }
+  },
+  {
+   "type": "state-timeline",
+   "title": "Machine state",
+   "targets": [
+    {
+     "refId": "A",
+     "datasource": {
+      "type": "influxdb",
+      "uid": "${DS_INFLUX}"
+     },
+     "rawSql": "SELECT time, state\nFROM machine\nWHERE $__timeFilter(time)\nORDER BY time",
+     "rawQuery": true,
+     "format": "time_series",
+     "dataset": "iox",
+     "table": "",
+     "sql": {}
+    }
+   ],
+   "fieldConfig": {
+    "defaults": {
+     "color": {
+      "mode": "fixed"
+     },
+     "custom": {
+      "fillOpacity": 85,
+      "lineWidth": 0
+     },
+     "mappings": [
+      {
+       "type": "value",
+       "options": {
+        "RUNNING": {
+         "color": "#3FB97E",
+         "index": 0,
+         "text": "RUNNING"
+        },
+        "IDLE": {
+         "color": "#E8B339",
+         "index": 1,
+         "text": "IDLE"
+        },
+        "FAULT": {
+         "color": "#E5484D",
+         "index": 2,
+         "text": "FAULT"
+        },
+        "CHANGEOVER": {
+         "color": "#6B7280",
+         "index": 3,
+         "text": "CHANGEOVER"
+        },
+        "PLANNED_STOP": {
+         "color": "#6B7280",
+         "index": 4,
+         "text": "PLANNED_STOP"
+        },
+        "STOPPED": {
+         "color": "#6B7280",
+         "index": 5,
+         "text": "STOPPED"
+        }
+       }
+      }
+     ]
+    },
+    "overrides": []
+   },
+   "options": {
+    "showValue": "never",
+    "mergeValues": true,
+    "rowHeight": 0.8,
+    "alignValue": "left",
+    "legend": {
+     "showLegend": true,
+     "displayMode": "list",
+     "placement": "bottom"
+    }
+   },
+   "id": 5,
+   "gridPos": {
+    "x": 0,
+    "y": 7,
+    "w": 24,
+    "h": 5
+   },
+   "datasource": {
+    "type": "influxdb",
+    "uid": "${DS_INFLUX}"
+   }
+  },
+  {
+   "type": "bargauge",
+   "title": "Where the shift went (minutes)",
+   "targets": [
+    {
+     "refId": "A",
+     "datasource": {
+      "type": "influxdb",
+      "uid": "${DS_INFLUX}"
+     },
+     "rawSql": "SELECT bucket, ROUND(SUM(dt) / 60.0, 1) AS minutes\nFROM machine\nWHERE $__timeFilter(time)\nGROUP BY bucket\nORDER BY bucket DESC",
+     "rawQuery": true,
+     "format": "table",
+     "dataset": "iox",
+     "table": "",
+     "sql": {}
+    }
+   ],
+   "fieldConfig": {
+    "defaults": {
+     "unit": "suffix: min",
+     "decimals": 1,
+     "min": 0,
+     "color": {
+      "mode": "fixed",
+      "fixedColor": "#3FB97E"
+     }
+    },
+    "overrides": [
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "run"
+      },
+      "properties": [
+       {
+        "id": "color",
+        "value": {
+         "mode": "fixed",
+         "fixedColor": "#3FB97E"
+        }
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "planned"
+      },
+      "properties": [
+       {
+        "id": "color",
+        "value": {
+         "mode": "fixed",
+         "fixedColor": "#6B7280"
+        }
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "unplanned"
+      },
+      "properties": [
+       {
+        "id": "color",
+        "value": {
+         "mode": "fixed",
+         "fixedColor": "#E5484D"
+        }
+       }
+      ]
+     }
+    ]
+   },
+   "options": {
+    "reduceOptions": {
+     "calcs": [],
+     "fields": "/^minutes$/",
+     "values": true
+    },
+    "orientation": "horizontal",
+    "displayMode": "basic",
+    "valueMode": "text",
+    "showUnfilled": true,
+    "namePlacement": "left",
+    "sizing": "auto"
+   },
+   "id": 6,
+   "gridPos": {
+    "x": 0,
+    "y": 12,
+    "w": 8,
+    "h": 7
+   },
+   "datasource": {
+    "type": "influxdb",
+    "uid": "${DS_INFLUX}"
+   }
+  },
+  {
+   "type": "barchart",
+   "title": "Unplanned downtime by reason \u2013 machine + operator (minutes)",
+   "targets": [
+    {
+     "refId": "A",
+     "datasource": {
+      "type": "influxdb",
+      "uid": "${DS_INFLUX}"
+     },
+     "rawSql": "SELECT\n  CASE\n    WHEN op_reason <> ''  THEN op_reason\n    WHEN state = 'IDLE'   THEN 'idle \u2013 waiting for operator'\n    ELSE reason\n  END AS reason,\n  ROUND(SUM(minutes), 1) AS minutes\nFROM stops\nWHERE type = 'unplanned' AND $__timeFilter(time)\nGROUP BY 1\nORDER BY minutes DESC",
+     "rawQuery": true,
+     "format": "table",
+     "dataset": "iox",
+     "table": "",
+     "sql": {}
+    }
+   ],
+   "fieldConfig": {
+    "defaults": {
+     "unit": "suffix: min",
+     "decimals": 1,
+     "color": {
+      "mode": "fixed",
+      "fixedColor": "#E5484D"
+     },
+     "custom": {
+      "fillOpacity": 85,
+      "lineWidth": 0
+     }
+    },
+    "overrides": []
+   },
+   "options": {
+    "orientation": "horizontal",
+    "xField": "reason",
+    "showValue": "always",
+    "barWidth": 0.7,
+    "groupWidth": 0.7,
+    "legend": {
+     "showLegend": false
+    },
+    "tooltip": {
+     "mode": "single"
+    }
+   },
+   "id": 7,
+   "gridPos": {
+    "x": 8,
+    "y": 12,
+    "w": 11,
+    "h": 7
+   },
+   "datasource": {
+    "type": "influxdb",
+    "uid": "${DS_INFLUX}"
+   }
+  },
+  {
+   "type": "stat",
+   "title": "Idle stops waiting for a reason",
+   "targets": [
+    {
+     "refId": "A",
+     "datasource": {
+      "type": "influxdb",
+      "uid": "${DS_INFLUX}"
+     },
+     "rawSql": "SELECT COUNT(*) AS waiting\nFROM stops\nWHERE state = 'IDLE' AND op_reason = '' AND $__timeFilter(time)",
+     "rawQuery": true,
+     "format": "table",
+     "dataset": "iox",
+     "table": "",
+     "sql": {}
+    }
+   ],
+   "fieldConfig": {
+    "defaults": {
+     "decimals": 0,
+     "color": {
+      "mode": "thresholds"
+     },
+     "thresholds": {
+      "mode": "absolute",
+      "steps": [
+       {
+        "color": "#3FB97E",
+        "value": null
+       },
+       {
+        "color": "#E8B339",
+        "value": 1
+       },
+       {
+        "color": "#E5484D",
+        "value": 3
+       }
+      ]
+     }
+    },
+    "overrides": []
+   },
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ],
+     "fields": "/^waiting$/",
+     "values": false
+    },
+    "colorMode": "background",
+    "graphMode": "none",
+    "textMode": "value",
+    "justifyMode": "center",
+    "orientation": "auto"
+   },
+   "id": 8,
+   "gridPos": {
+    "x": 19,
+    "y": 12,
+    "w": 5,
+    "h": 7
+   },
+   "datasource": {
+    "type": "influxdb",
+    "uid": "${DS_INFLUX}"
+   }
+  },
+  {
+   "type": "timeseries",
+   "title": "Parts (counter)",
+   "targets": [
+    {
+     "refId": "A",
+     "datasource": {
+      "type": "influxdb",
+      "uid": "${DS_INFLUX}"
+     },
+     "rawSql": "SELECT time, good, scrap\nFROM machine\nWHERE $__timeFilter(time)\nORDER BY time",
+     "rawQuery": true,
+     "format": "time_series",
+     "dataset": "iox",
+     "table": "",
+     "sql": {}
+    }
+   ],
+   "fieldConfig": {
+    "defaults": {
+     "custom": {
+      "lineWidth": 2,
+      "fillOpacity": 10
+     },
+     "color": {
+      "mode": "fixed",
+      "fixedColor": "#3FB97E"
+     }
+    },
+    "overrides": [
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "scrap"
+      },
+      "properties": [
+       {
+        "id": "color",
+        "value": {
+         "mode": "fixed",
+         "fixedColor": "#E5484D"
+        }
+       },
+       {
+        "id": "custom.axisPlacement",
+        "value": "right"
+       }
+      ]
+     }
+    ]
+   },
+   "options": {
+    "legend": {
+     "showLegend": true,
+     "displayMode": "list",
+     "placement": "bottom"
+    },
+    "tooltip": {
+     "mode": "multi"
+    }
+   },
+   "id": 9,
+   "gridPos": {
+    "x": 0,
+    "y": 19,
+    "w": 10,
+    "h": 8
+   },
+   "datasource": {
+    "type": "influxdb",
+    "uid": "${DS_INFLUX}"
+   }
+  },
+  {
+   "type": "table",
+   "title": "Stop log",
+   "targets": [
+    {
+     "refId": "A",
+     "datasource": {
+      "type": "influxdb",
+      "uid": "${DS_INFLUX}"
+     },
+     "rawSql": "SELECT started AS \"start\", ended AS \"end\", minutes, type, reason AS \"machine says\", op_reason AS \"operator says\"\nFROM stops\nWHERE $__timeFilter(time)\nORDER BY time DESC\nLIMIT 50",
+     "rawQuery": true,
+     "format": "table",
+     "dataset": "iox",
+     "table": "",
+     "sql": {}
+    }
+   ],
+   "fieldConfig": {
+    "defaults": {},
+    "overrides": [
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "type"
+      },
+      "properties": [
+       {
+        "id": "custom.cellOptions",
+        "value": {
+         "type": "color-text"
+        }
+       },
+       {
+        "id": "mappings",
+        "value": [
+         {
+          "type": "value",
+          "options": {
+           "planned": {
+            "color": "#6B7280",
+            "index": 0
+           },
+           "unplanned": {
+            "color": "#E5484D",
+            "index": 1
+           }
+          }
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   },
+   "options": {
+    "showHeader": true,
+    "cellHeight": "sm"
+   },
+   "id": 10,
+   "gridPos": {
+    "x": 10,
+    "y": 19,
+    "w": 14,
+    "h": 8
+   },
+   "datasource": {
+    "type": "influxdb",
+    "uid": "${DS_INFLUX}"
+   }
+  },
+  {
+   "type": "table",
+   "title": "Long-stop alerts",
+   "targets": [
+    {
+     "refId": "A",
+     "datasource": {
+      "type": "influxdb",
+      "uid": "${DS_INFLUX}"
+     },
+     "rawSql": "SELECT started, raised_at AS \"alert at\", state, reason, status, total_minutes AS \"total min\"\nFROM alerts\nWHERE $__timeFilter(time)\nORDER BY time DESC",
+     "rawQuery": true,
+     "format": "table",
+     "dataset": "iox",
+     "table": "",
+     "sql": {}
+    }
+   ],
+   "fieldConfig": {
+    "defaults": {},
+    "overrides": [
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "status"
+      },
+      "properties": [
+       {
+        "id": "custom.cellOptions",
+        "value": {
+         "type": "color-text"
+        }
+       },
+       {
+        "id": "mappings",
+        "value": [
+         {
+          "type": "value",
+          "options": {
+           "open": {
+            "color": "#E5484D",
+            "index": 0
+           },
+           "cleared": {
+            "color": "#3FB97E",
+            "index": 1
+           }
+          }
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   },
+   "options": {
+    "showHeader": true,
+    "cellHeight": "sm"
+   },
+   "id": 11,
+   "gridPos": {
+    "x": 0,
+    "y": 27,
+    "w": 10,
+    "h": 6
+   },
+   "datasource": {
+    "type": "influxdb",
+    "uid": "${DS_INFLUX}"
+   }
+  },
+  {
+   "type": "table",
+   "title": "Shift reports (written by Node-RED)",
+   "targets": [
+    {
+     "refId": "A",
+     "datasource": {
+      "type": "influxdb",
+      "uid": "${DS_INFLUX}"
+     },
+     "rawSql": "SELECT time AS \"report\", ROUND(oee * 100, 1) AS \"OEE %\", ROUND(availability * 100, 1) AS \"A %\",\n  ROUND(performance * 100, 1) AS \"P %\", ROUND(quality * 100, 1) AS \"Q %\", unplanned_min AS \"unplanned min\",\n  top_reason AS \"top reason\", alerts\nFROM shift_reports\nORDER BY time DESC\nLIMIT 20",
+     "rawQuery": true,
+     "format": "table",
+     "dataset": "iox",
+     "table": "",
+     "sql": {}
+    }
+   ],
+   "fieldConfig": {
+    "defaults": {},
+    "overrides": []
+   },
+   "options": {
+    "showHeader": true,
+    "cellHeight": "sm"
+   },
+   "id": 12,
+   "gridPos": {
+    "x": 10,
+    "y": 27,
+    "w": 14,
+    "h": 6
+   },
+   "datasource": {
+    "type": "influxdb",
+    "uid": "${DS_INFLUX}"
+   }
+  }
+ ],
+ "templating": {
+  "list": []
+ },
+ "annotations": {
+  "list": []
+ }
+}
