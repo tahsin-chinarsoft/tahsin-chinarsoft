@@ -5,6 +5,8 @@ against the [ChinarSoft virtual machine](../Virtual_Machine) — no PLC or hardw
 
 Playlist: https://www.youtube.com/@chinarsoft
 
+**Series complete — six episodes.** Every flow and dashboard below runs against the virtual machine; swap it for your real machine by changing the Modbus host and register addresses.
+
 | Episode | Topic | Files |
 |---|---|---|
 | 1 | [Why Your OEE Numbers Are Lying](https://youtu.be/hhvWb7x-EDg) — OEE by hand, planned vs unplanned downtime | uses the virtual machine only |
@@ -13,4 +15,3 @@ Playlist: https://www.youtube.com/@chinarsoft
 | 4 | [My OEE Dashboard Calculates Itself](https://youtu.be/naU2jr2Qz2Y) — Grafana + InfluxDB 3, OEE in one SQL query | [Episode_04_Grafana](Episode_04_Grafana) |
 | 5 | [The Machine Says Material Shortage. My Operator Says Why](https://youtu.be/A06nSdcJK70) — a one-tap tablet page, answers in the same InfluxDB row | [Episode_05_Operator_Reasons](Episode_05_Operator_Reasons) |
 | 6 | A long-stop alert and an automatic shift report — dashboard + Grafana | [Episode_06_Alerts_Shift_Report](Episode_06_Alerts_Shift_Report) |
-| 7 | The whole stack on a Raspberry Pi, 24/7 | coming soon |
