@@ -1,0 +1,15 @@
+# Optional: provision the data source instead of clicking through the UI.
+# Copy to <grafana>/conf/provisioning/datasources/ and restart Grafana.
+apiVersion: 1
+datasources:
+  - name: InfluxDB factory (SQL)
+    type: influxdb
+    access: proxy
+    url: http://127.0.0.1:8181
+    jsonData:
+      version: SQL
+      dbName: factory
+      httpMode: POST
+      insecureGrpc: true      # local InfluxDB without TLS
+    secureJsonData:
+      token: '<YOUR_INFLUXDB_TOKEN>'
