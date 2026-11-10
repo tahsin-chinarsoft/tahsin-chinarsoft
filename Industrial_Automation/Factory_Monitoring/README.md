@@ -12,5 +12,5 @@ Playlist: https://www.youtube.com/@chinarsoft
 | 3 | [Node-RED Restarted. My Downtime Totals Didn't Reset](https://youtu.be/c35AnljQmC4) — InfluxDB 3 Core, every reading stored | [Episode_03_InfluxDB](Episode_03_InfluxDB) |
 | 4 | [My OEE Dashboard Calculates Itself](https://youtu.be/naU2jr2Qz2Y) — Grafana + InfluxDB 3, OEE in one SQL query | [Episode_04_Grafana](Episode_04_Grafana) |
 | 5 | [The Machine Says Material Shortage. My Operator Says Why](https://youtu.be/A06nSdcJK70) — a one-tap tablet page, answers in the same InfluxDB row | [Episode_05_Operator_Reasons](Episode_05_Operator_Reasons) |
-| 6 | A long-stop alert and an automatic shift report — dashboard + Grafana | [Episode_06_Alerts_Shift_Report](Episode_06_Alerts_Shift_Report) |
+| 6 | [My Factory Dashboard Now Writes Its Own Shift Report](https://youtu.be/cEYQR0-lJm4) — long-stop alert + automatic shift report (finale) | [Episode_06_Alerts_Shift_Report](Episode_06_Alerts_Shift_Report) |
 | 7 | The whole stack on a Raspberry Pi, 24/7 | coming soon |
