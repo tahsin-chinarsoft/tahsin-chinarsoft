@@ -1,0 +1,33 @@
+start,end,minutes,state,reason,type
+00:01,00:16,14.6,CHANGEOVER,changeover,planned
+00:22,00:24,2,IDLE,material shortage,unplanned
+00:35,00:50,15,CHANGEOVER,changeover,planned
+00:51,00:54,3,FAULT,jam,unplanned
+00:59,01:00,1,FAULT,jam,unplanned
+01:05,01:07,2,FAULT,sensor fault,unplanned
+01:19,01:36,17,PLANNED_STOP,break/meal,planned
+01:46,01:47,1,FAULT,jam,unplanned
+01:50,01:53,3,FAULT,jam,unplanned
+01:57,01:59,2,FAULT,jam,unplanned
+02:08,02:11,3,IDLE,material shortage,unplanned
+02:14,02:15,1,FAULT,jam,unplanned
+02:22,02:25,3,IDLE,material shortage,unplanned
+02:39,02:40,1,FAULT,jam,unplanned
+02:47,02:50,3,IDLE,material shortage,unplanned
+02:55,02:57,2,FAULT,jam,unplanned
+02:58,03:00,2,IDLE,material shortage,unplanned
+03:04,03:06,2,FAULT,jam,unplanned
+03:19,03:26,7,IDLE,material shortage,unplanned
+03:29,03:56,27,PLANNED_STOP,break/meal,planned
+04:00,04:04,4,IDLE,material shortage,unplanned
+04:16,04:18,2,FAULT,jam,unplanned
+04:22,04:26,4,FAULT,sensor fault,unplanned
+04:36,04:51,15,CHANGEOVER,changeover,planned
+05:08,05:11,3,FAULT,sensor fault,unplanned
+05:41,05:43,2,IDLE,material shortage,unplanned
+05:48,05:50,2,FAULT,jam,unplanned
+06:00,06:10,10,CHANGEOVER,changeover,planned
+06:17,06:18,1,FAULT,jam,unplanned
+06:47,06:49,2,FAULT,jam,unplanned
+06:56,06:59,3,FAULT,jam,unplanned
+07:29,07:56,27,PLANNED_STOP,break/meal,planned

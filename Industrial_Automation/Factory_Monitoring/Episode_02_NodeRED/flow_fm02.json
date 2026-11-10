@@ -1,0 +1,395 @@
+[
+ {
+  "id": "fm020000",
+  "type": "tab",
+  "label": "Factory Monitoring \u2013 Ep 2",
+  "disabled": false,
+  "info": "ChinarSoft \u00b7 Build a Factory Monitoring System from Scratch \u00b7 Episode 2\nReads the virtual machine over Modbus TCP and logs every stop."
+ },
+ {
+  "id": "fm020010",
+  "type": "comment",
+  "z": "fm020000",
+  "name": "Start the machine first: python3 machine_sim.py --seed 7 --speed 60",
+  "info": "",
+  "x": 300,
+  "y": 40,
+  "wires": []
+ },
+ {
+  "id": "fm020001",
+  "type": "modbus-client",
+  "name": "ChinarSoft virtual machine",
+  "clienttype": "tcp",
+  "bufferCommands": true,
+  "stateLogEnabled": false,
+  "queueLogEnabled": false,
+  "failureLogEnabled": true,
+  "tcpHost": "127.0.0.1",
+  "tcpPort": "5020",
+  "tcpType": "DEFAULT",
+  "serialPort": "/dev/ttyUSB",
+  "serialType": "RTU-BUFFERD",
+  "serialBaudrate": "9600",
+  "serialDatabits": "8",
+  "serialStopbits": "1",
+  "serialParity": "none",
+  "serialConnectionDelay": "100",
+  "serialAsciiResponseStartDelimiter": "0x3A",
+  "unit_id": "1",
+  "commandDelay": "1",
+  "clientTimeout": "1000",
+  "reconnectOnTimeout": true,
+  "reconnectTimeout": "2000",
+  "parallelUnitIdsAllowed": true,
+  "showErrors": false,
+  "showWarnings": true,
+  "showLogs": true
+ },
+ {
+  "id": "fm020002",
+  "type": "modbus-read",
+  "z": "fm020000",
+  "name": "Read machine (HR 0\u201311, 1 s)",
+  "topic": "machine",
+  "showStatusActivities": true,
+  "logIOActivities": false,
+  "showErrors": true,
+  "showWarnings": true,
+  "unitid": "1",
+  "dataType": "HoldingRegister",
+  "adr": "0",
+  "quantity": "12",
+  "rate": "1",
+  "rateUnit": "s",
+  "delayOnStart": false,
+  "startDelayTime": "",
+  "server": "fm020001",
+  "useIOFile": false,
+  "ioFile": "",
+  "useIOForPayload": false,
+  "emptyMsgOnFail": false,
+  "x": 170,
+  "y": 120,
+  "wires": [
+   [
+    "fm020003"
+   ],
+   []
+  ]
+ },
+ {
+  "id": "fm020003",
+  "type": "function",
+  "z": "fm020000",
+  "name": "Decode registers",
+  "func": "// Holding registers 0..11 from the ChinarSoft virtual machine -> one object\nconst r = msg.payload;\nconst STATES  = ['STOPPED', 'RUNNING', 'IDLE', 'FAULT', 'CHANGEOVER', 'PLANNED_STOP'];\nconst REASONS = ['-', 'material shortage', 'jam', 'motor overload', 'sensor fault',\n                 'changeover', 'break/meal', 'planned maintenance'];\n\nmsg.payload = {\n    state:      STATES[r[0]] ?? `UNKNOWN(${r[0]})`,\n    reason:     REASONS[r[1]] ?? String(r[1]),\n    good:       r[2] * 65536 + r[3],      // 32-bit counter, high word first\n    scrap:      r[4] * 65536 + r[5],\n    idealCycle: r[6] / 10,                // seconds\n    cycle:      r[7] / 10,                // seconds\n    product:    r[8],\n    temp:       r[9] / 10,                // degC\n    heartbeat:  r[10],                    // +1 per machine second\n    inState:    r[11]                     // machine seconds in current state\n};\nreturn msg;\n",
+  "outputs": 1,
+  "timeout": 0,
+  "noerr": 0,
+  "initialize": "",
+  "finalize": "",
+  "libs": [],
+  "x": 400,
+  "y": 120,
+  "wires": [
+   [
+    "fm020004"
+   ]
+  ]
+ },
+ {
+  "id": "fm020004",
+  "type": "function",
+  "z": "fm020000",
+  "name": "Detect stops",
+  "func": "// Detects every state change and turns each finished stop into one record.\n// Time comes from the machine's own heartbeat (+1 per machine second),\n// so durations stay correct at any simulator --speed.\nconst p = msg.payload;\nconst PLANNED = ['CHANGEOVER', 'PLANNED_STOP'];\nconst bucket = s => s === 'RUNNING' ? 'run' : PLANNED.includes(s) ? 'planned' : 'unplanned';\n\nlet last   = context.get('last');\nlet clock  = context.get('clock')  || 0;                    // machine seconds\nlet totals = context.get('totals') || { run: 0, planned: 0, unplanned: 0 };\nlet log    = context.get('log')    || [];\n\nif (!last) {                                                // first reading\n    clock = p.heartbeat;\n    last  = { state: p.state, reason: p.reason, since: clock - p.inState };\n    totals[bucket(p.state)] += p.inState;\n} else {\n    const dt = (p.heartbeat - last.hb + 65536) % 65536;     // heartbeat wraps at 65535\n    clock += dt;\n    totals[bucket(last.state)] += dt;\n}\n\nconst hhmm = s => String(Math.floor(s / 3600)).padStart(2, '0') + ':' +\n                  String(Math.floor(s / 60) % 60).padStart(2, '0');\nlet stop = null;\n\nif (p.state !== last.state) {\n    if (last.state !== 'RUNNING') {                          // a stop just ended\n        stop = { payload: {\n            start:   hhmm(last.since),\n            end:     hhmm(clock),\n            minutes: Math.round((clock - last.since) / 6) / 10,\n            state:   last.state,\n            reason:  last.reason,\n            type:    bucket(last.state)\n        }};\n        log = [stop.payload, ...log].slice(0, 50);           // newest first\n    }\n    last = { state: p.state, reason: p.reason, since: clock };\n}\nlast.hb = p.heartbeat;\n\ncontext.set('last', last);\ncontext.set('clock', clock);\ncontext.set('totals', totals);\ncontext.set('log', log);\n\nconst live = { payload: { ...p, clock: hhmm(clock), totals: {\n    run:       Math.round(totals.run / 60),\n    planned:   Math.round(totals.planned / 60),\n    unplanned: Math.round(totals.unplanned / 60)\n}}};\nreturn [live, stop, stop ? { payload: log } : null];\n",
+  "outputs": 3,
+  "timeout": 0,
+  "noerr": 0,
+  "initialize": "",
+  "finalize": "",
+  "libs": [],
+  "outputLabels": [
+   "live status",
+   "finished stop",
+   "stop log (newest first)"
+  ],
+  "x": 600,
+  "y": 120,
+  "wires": [
+   [
+    "fm02000d"
+   ],
+   [
+    "fm020005",
+    "fm020007"
+   ],
+   [
+    "fm02000e"
+   ]
+  ]
+ },
+ {
+  "id": "fm020005",
+  "type": "function",
+  "z": "fm020000",
+  "name": "To CSV line",
+  "func": "// One CSV line per stop; writes the header once when the file is new.\nconst s = msg.payload;\nconst file = env.get('STOPS_FILE') || 'stops.csv';\nlet line = [s.start, s.end, s.minutes, s.state, s.reason, s.type].join(',');\nif (!fs.existsSync(file)) line = 'start,end,minutes,state,reason,type\\n' + line;\nmsg.filename = file;\nmsg.payload = line;\nreturn msg;\n",
+  "outputs": 1,
+  "timeout": 0,
+  "noerr": 0,
+  "initialize": "",
+  "finalize": "",
+  "libs": [
+   {
+    "var": "fs",
+    "module": "fs"
+   }
+  ],
+  "x": 830,
+  "y": 220,
+  "wires": [
+   [
+    "fm020006"
+   ]
+  ]
+ },
+ {
+  "id": "fm020006",
+  "type": "file",
+  "z": "fm020000",
+  "name": "Append to stops.csv",
+  "filename": "filename",
+  "filenameType": "msg",
+  "appendNewline": true,
+  "createDir": true,
+  "overwriteFile": "false",
+  "encoding": "utf8",
+  "x": 1050,
+  "y": 220,
+  "wires": [
+   []
+  ]
+ },
+ {
+  "id": "fm020007",
+  "type": "debug",
+  "z": "fm020000",
+  "name": "Stop log",
+  "active": true,
+  "tosidebar": true,
+  "console": false,
+  "tostatus": true,
+  "complete": "payload",
+  "targetType": "msg",
+  "statusVal": "payload.reason",
+  "statusType": "msg",
+  "x": 820,
+  "y": 280,
+  "wires": []
+ },
+ {
+  "id": "fm020008",
+  "type": "ui-base",
+  "name": "ChinarSoft",
+  "path": "/dashboard",
+  "appIcon": "",
+  "includeClientData": true,
+  "acceptsClientConfig": [
+   "ui-notification",
+   "ui-control"
+  ],
+  "showPathInSidebar": false,
+  "headerContent": "page",
+  "navigationStyle": "none",
+  "titleBarStyle": "default",
+  "showReconnectNotification": true,
+  "notificationDisplayTime": 1,
+  "showDisconnectNotification": true,
+  "allowInstall": false
+ },
+ {
+  "id": "fm020009",
+  "type": "ui-theme",
+  "name": "ChinarSoft dark",
+  "colors": {
+   "surface": "#121417",
+   "primary": "#F28C28",
+   "bgPage": "#121417",
+   "groupBg": "#16191D",
+   "groupOutline": "#2A2F36"
+  },
+  "sizes": {
+   "density": "default",
+   "pagePadding": "16px",
+   "groupGap": "16px",
+   "groupBorderRadius": "12px",
+   "widgetGap": "12px"
+  }
+ },
+ {
+  "id": "fm02000a",
+  "type": "ui-page",
+  "name": "Packaging machine \u2013 live",
+  "ui": "fm020008",
+  "path": "/machine",
+  "icon": "factory",
+  "layout": "grid",
+  "theme": "fm020009",
+  "breakpoints": [
+   {
+    "name": "Default",
+    "px": "0",
+    "cols": "3"
+   },
+   {
+    "name": "Tablet",
+    "px": "576",
+    "cols": "6"
+   },
+   {
+    "name": "Small Desktop",
+    "px": "768",
+    "cols": "9"
+   },
+   {
+    "name": "Desktop",
+    "px": "1024",
+    "cols": "12"
+   }
+  ],
+  "order": 1,
+  "className": "",
+  "visible": "true",
+  "disabled": "false"
+ },
+ {
+  "id": "fm02000b",
+  "type": "ui-group",
+  "name": "Machine status",
+  "page": "fm02000a",
+  "width": "12",
+  "height": "1",
+  "order": 1,
+  "showTitle": true,
+  "className": "",
+  "visible": "true",
+  "disabled": "false",
+  "groupType": "default"
+ },
+ {
+  "id": "fm02000c",
+  "type": "ui-group",
+  "name": "Stop log (machine time)",
+  "page": "fm02000a",
+  "width": "12",
+  "height": "1",
+  "order": 3,
+  "showTitle": true,
+  "className": "",
+  "visible": "true",
+  "disabled": "false",
+  "groupType": "default"
+ },
+ {
+  "id": "fm02000d",
+  "type": "ui-template",
+  "z": "fm020000",
+  "group": "fm02000b",
+  "page": "",
+  "ui": "",
+  "name": "Status card",
+  "order": 1,
+  "width": "12",
+  "height": "5",
+  "head": "",
+  "format": "<template>\n  <div class=\"m\" v-if=\"msg && msg.payload\">\n    <div class=\"top\">\n      <div class=\"state\" :style=\"{ background: color }\">{{ msg.payload.state }}</div>\n      <div class=\"reason\">{{ msg.payload.reason === '-' ? '' : msg.payload.reason }}</div>\n      <div class=\"clock\">machine time {{ msg.payload.clock }}</div>\n    </div>\n    <div class=\"row\">\n      <div class=\"kpi\"><span>GOOD</span><b>{{ fmt(msg.payload.good) }}</b></div>\n      <div class=\"kpi\"><span>SCRAP</span><b class=\"bad\">{{ fmt(msg.payload.scrap) }}</b></div>\n      <div class=\"kpi\"><span>CYCLE</span><b>{{ msg.payload.cycle.toFixed(1) }} s</b></div>\n      <div class=\"kpi\"><span>MOTOR</span><b>{{ msg.payload.temp.toFixed(1) }} \u00b0C</b></div>\n    </div>\n    <div class=\"bar\">\n      <div class=\"seg run\" :style=\"{ flex: msg.payload.totals.run || 0.0001 }\"></div>\n      <div class=\"seg pl\" :style=\"{ flex: msg.payload.totals.planned }\"></div>\n      <div class=\"seg un\" :style=\"{ flex: msg.payload.totals.unplanned }\"></div>\n    </div>\n    <div class=\"legend\">\n      <span><i class=\"run\"></i>Running {{ msg.payload.totals.run }} min</span>\n      <span><i class=\"pl\"></i>Planned stops {{ msg.payload.totals.planned }} min</span>\n      <span><i class=\"un\"></i>Unplanned stops {{ msg.payload.totals.unplanned }} min</span>\n    </div>\n  </div>\n  <div v-else class=\"wait\">Waiting for the machine\u2026</div>\n</template>\n\n<script>\nexport default {\n  methods: { fmt(n) { return Number(n).toLocaleString('en-US') } },\n  computed: {\n    color() {\n      const s = this.msg?.payload?.state\n      if (s === 'RUNNING') return '#2E9E6A'\n      if (s === 'CHANGEOVER' || s === 'PLANNED_STOP') return '#5C6675'\n      if (s === 'IDLE') return '#C9861C'\n      return '#D0393F'\n    }\n  }\n}\n</script>\n\n<style scoped>\n.m { font-family: Inter, system-ui, sans-serif; color: #F2EFE9; padding: 8px 4px; }\n.top { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }\n.state { font-size: 34px; font-weight: 800; letter-spacing: 1px; padding: 8px 18px; border-radius: 10px; }\n.reason { font-size: 24px; color: #F5B342; }\n.clock { margin-left: auto; font-family: 'JetBrains Mono', monospace; color: #A8B0BA; font-size: 18px; }\n.row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 18px 0; }\n.kpi { background: #1B1F24; border-radius: 10px; padding: 12px 14px; display: flex; flex-direction: column; gap: 4px; }\n.kpi span { font-size: 13px; letter-spacing: 2px; color: #A8B0BA; font-weight: 700; }\n.kpi b { font-size: 30px; font-family: 'JetBrains Mono', monospace; }\n.kpi b.bad { color: #E5484D; }\n.bar { display: flex; height: 22px; border-radius: 6px; overflow: hidden; background: #1B1F24; }\n.seg.run, i.run { background: #2E9E6A; } .seg.pl, i.pl { background: #5C6675; } .seg.un, i.un { background: #D0393F; }\n.legend { display: flex; gap: 22px; margin-top: 10px; font-size: 16px; color: #C9CED6; flex-wrap: wrap; }\n.legend i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }\n.wait { color: #A8B0BA; font-size: 20px; padding: 20px; }\n</style>\n",
+  "storeOutMessages": true,
+  "passthru": false,
+  "resendOnRefresh": true,
+  "templateScope": "local",
+  "className": "",
+  "x": 830,
+  "y": 100,
+  "wires": [
+   []
+  ]
+ },
+ {
+  "id": "fm02000e",
+  "type": "ui-table",
+  "z": "fm020000",
+  "group": "fm02000c",
+  "name": "Stop log",
+  "label": "",
+  "order": 1,
+  "width": "12",
+  "height": "8",
+  "maxrows": "6",
+  "passthru": false,
+  "autocols": false,
+  "showSearch": false,
+  "deselect": true,
+  "selectionType": "none",
+  "columns": [
+   {
+    "title": "Start",
+    "key": "start",
+    "keyType": "key",
+    "type": "text",
+    "width": "",
+    "align": "start"
+   },
+   {
+    "title": "End",
+    "key": "end",
+    "keyType": "key",
+    "type": "text",
+    "width": "",
+    "align": "start"
+   },
+   {
+    "title": "Minutes",
+    "key": "minutes",
+    "keyType": "key",
+    "type": "text",
+    "width": "",
+    "align": "end"
+   },
+   {
+    "title": "State",
+    "key": "state",
+    "keyType": "key",
+    "type": "text",
+    "width": "",
+    "align": "start"
+   },
+   {
+    "title": "Reason",
+    "key": "reason",
+    "keyType": "key",
+    "type": "text",
+    "width": "",
+    "align": "start"
+   },
+   {
+    "title": "Type",
+    "key": "type",
+    "keyType": "key",
+    "type": "text",
+    "width": "",
+    "align": "start"
+   }
+  ],
+  "mobileBreakpoint": "sm",
+  "mobileBreakpointType": "defaults",
+  "action": "replace",
+  "className": "",
+  "x": 820,
+  "y": 160,
+  "wires": [
+   []
+  ]
+ }
+]
