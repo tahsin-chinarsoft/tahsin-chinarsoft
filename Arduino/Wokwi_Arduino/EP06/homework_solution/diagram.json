@@ -1,0 +1,219 @@
+{
+  "version": 1,
+  "author": "ChinarSoft",
+  "editor": "wokwi",
+  "parts": [
+    {
+      "type": "wokwi-arduino-uno",
+      "id": "uno",
+      "top": 0,
+      "left": 0,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-potentiometer",
+      "id": "pot",
+      "top": -130,
+      "left": -90,
+      "attrs": {
+        "value": "512"
+      }
+    },
+    {
+      "type": "wokwi-led-bar-graph",
+      "id": "bar",
+      "top": -150,
+      "left": 120,
+      "attrs": {
+        "color": "lime"
+      }
+    }
+  ],
+  "connections": [
+    [
+      "pot:GND",
+      "uno:GND.2",
+      "black",
+      [
+        "v0"
+      ]
+    ],
+    [
+      "pot:VCC",
+      "uno:5V",
+      "red",
+      [
+        "v0"
+      ]
+    ],
+    [
+      "pot:SIG",
+      "uno:A0",
+      "orange",
+      [
+        "v0"
+      ]
+    ],
+    [
+      "bar:A1",
+      "uno:2",
+      "green",
+      [
+        "v0"
+      ]
+    ],
+    [
+      "bar:C1",
+      "uno:GND.1",
+      "black",
+      [
+        "v0"
+      ]
+    ],
+    [
+      "bar:A2",
+      "uno:3",
+      "green",
+      [
+        "v0"
+      ]
+    ],
+    [
+      "bar:C2",
+      "uno:GND.1",
+      "black",
+      [
+        "v0"
+      ]
+    ],
+    [
+      "bar:A3",
+      "uno:4",
+      "green",
+      [
+        "v0"
+      ]
+    ],
+    [
+      "bar:C3",
+      "uno:GND.1",
+      "black",
+      [
+        "v0"
+      ]
+    ],
+    [
+      "bar:A4",
+      "uno:5",
+      "green",
+      [
+        "v0"
+      ]
+    ],
+    [
+      "bar:C4",
+      "uno:GND.1",
+      "black",
+      [
+        "v0"
+      ]
+    ],
+    [
+      "bar:A5",
+      "uno:6",
+      "green",
+      [
+        "v0"
+      ]
+    ],
+    [
+      "bar:C5",
+      "uno:GND.1",
+      "black",
+      [
+        "v0"
+      ]
+    ],
+    [
+      "bar:A6",
+      "uno:7",
+      "green",
+      [
+        "v0"
+      ]
+    ],
+    [
+      "bar:C6",
+      "uno:GND.1",
+      "black",
+      [
+        "v0"
+      ]
+    ],
+    [
+      "bar:A7",
+      "uno:8",
+      "green",
+      [
+        "v0"
+      ]
+    ],
+    [
+      "bar:C7",
+      "uno:GND.1",
+      "black",
+      [
+        "v0"
+      ]
+    ],
+    [
+      "bar:A8",
+      "uno:9",
+      "green",
+      [
+        "v0"
+      ]
+    ],
+    [
+      "bar:C8",
+      "uno:GND.1",
+      "black",
+      [
+        "v0"
+      ]
+    ],
+    [
+      "bar:A9",
+      "uno:10",
+      "green",
+      [
+        "v0"
+      ]
+    ],
+    [
+      "bar:C9",
+      "uno:GND.1",
+      "black",
+      [
+        "v0"
+      ]
+    ],
+    [
+      "bar:A10",
+      "uno:11",
+      "green",
+      [
+        "v0"
+      ]
+    ],
+    [
+      "bar:C10",
+      "uno:GND.1",
+      "black",
+      [
+        "v0"
+      ]
+    ]
+  ],
+  "dependencies": {}
+}

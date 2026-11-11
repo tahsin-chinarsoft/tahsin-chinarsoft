@@ -1,0 +1,161 @@
+{
+  "version": 1,
+  "author": "ChinarSoft",
+  "editor": "wokwi",
+  "parts": [
+    {
+      "type": "wokwi-arduino-uno",
+      "id": "uno",
+      "top": 0,
+      "left": 0,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-led",
+      "id": "led1",
+      "top": -130,
+      "left": 215,
+      "attrs": {
+        "color": "red"
+      }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r1",
+      "top": -52,
+      "left": 166,
+      "rotate": 90,
+      "attrs": {
+        "value": "220"
+      }
+    },
+    {
+      "type": "wokwi-slide-potentiometer",
+      "id": "pot1",
+      "top": 260,
+      "left": 20,
+      "attrs": {
+        "travelLength": "30",
+        "value": "217"
+      }
+    },
+    {
+      "type": "wokwi-lcd1602",
+      "id": "lcd1",
+      "top": -150,
+      "left": 330,
+      "attrs": {
+        "pins": "i2c"
+      }
+    },
+    {
+      "type": "wokwi-pushbutton",
+      "id": "btn1",
+      "top": -90,
+      "left": -80,
+      "attrs": {
+        "color": "green",
+        "label": "REPLACE LED"
+      }
+    }
+  ],
+  "connections": [
+    [
+      "uno:9",
+      "r1:2",
+      "green",
+      [
+        "v0"
+      ]
+    ],
+    [
+      "r1:1",
+      "led1:A",
+      "green",
+      [
+        "v0"
+      ]
+    ],
+    [
+      "led1:C",
+      "uno:GND.1",
+      "black",
+      [
+        "v0"
+      ]
+    ],
+    [
+      "pot1:VCC",
+      "uno:5V",
+      "red",
+      [
+        "v0"
+      ]
+    ],
+    [
+      "pot1:GND",
+      "uno:GND.2",
+      "black",
+      [
+        "v0"
+      ]
+    ],
+    [
+      "pot1:SIG",
+      "uno:A0",
+      "orange",
+      [
+        "v0"
+      ]
+    ],
+    [
+      "lcd1:GND",
+      "uno:GND.3",
+      "black",
+      [
+        "v0"
+      ]
+    ],
+    [
+      "lcd1:VCC",
+      "uno:5V",
+      "red",
+      [
+        "v0"
+      ]
+    ],
+    [
+      "lcd1:SDA",
+      "uno:A4",
+      "blue",
+      [
+        "v0"
+      ]
+    ],
+    [
+      "lcd1:SCL",
+      "uno:A5",
+      "purple",
+      [
+        "v0"
+      ]
+    ],
+    [
+      "btn1:1.r",
+      "uno:2",
+      "green",
+      [
+        "v0"
+      ]
+    ],
+    [
+      "btn1:2.r",
+      "uno:GND.1",
+      "black",
+      [
+        "v0"
+      ]
+    ]
+  ],
+  "dependencies": {}
+}

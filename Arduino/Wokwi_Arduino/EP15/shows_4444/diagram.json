@@ -1,0 +1,115 @@
+{
+  "version": 1,
+  "author": "ChinarSoft",
+  "editor": "wokwi",
+  "parts": [
+    {
+      "type": "wokwi-arduino-uno",
+      "id": "uno",
+      "top": 0,
+      "left": 0,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-7segment",
+      "id": "sevseg",
+      "top": -140,
+      "left": 60,
+      "attrs": {
+        "digits": "4",
+        "common": "cathode"
+      }
+    }
+  ],
+  "connections": [
+    [
+      "sevseg:A",
+      "uno:2",
+      "green",
+      [
+        "v0"
+      ]
+    ],
+    [
+      "sevseg:B",
+      "uno:3",
+      "green",
+      [
+        "v0"
+      ]
+    ],
+    [
+      "sevseg:C",
+      "uno:4",
+      "green",
+      [
+        "v0"
+      ]
+    ],
+    [
+      "sevseg:D",
+      "uno:5",
+      "green",
+      [
+        "v0"
+      ]
+    ],
+    [
+      "sevseg:E",
+      "uno:6",
+      "green",
+      [
+        "v0"
+      ]
+    ],
+    [
+      "sevseg:F",
+      "uno:7",
+      "green",
+      [
+        "v0"
+      ]
+    ],
+    [
+      "sevseg:G",
+      "uno:8",
+      "green",
+      [
+        "v0"
+      ]
+    ],
+    [
+      "sevseg:DIG1",
+      "uno:9",
+      "blue",
+      [
+        "v0"
+      ]
+    ],
+    [
+      "sevseg:DIG2",
+      "uno:10",
+      "blue",
+      [
+        "v0"
+      ]
+    ],
+    [
+      "sevseg:DIG3",
+      "uno:11",
+      "blue",
+      [
+        "v0"
+      ]
+    ],
+    [
+      "sevseg:DIG4",
+      "uno:12",
+      "blue",
+      [
+        "v0"
+      ]
+    ]
+  ],
+  "dependencies": {}
+}

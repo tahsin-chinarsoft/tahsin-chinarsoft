@@ -1,0 +1,211 @@
+{
+  "version": 1,
+  "author": "ChinarSoft",
+  "editor": "wokwi",
+  "parts": [
+    {
+      "type": "wokwi-arduino-uno",
+      "id": "uno",
+      "top": 0,
+      "left": 0,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-rgb-led",
+      "id": "rgb",
+      "top": -170,
+      "left": 180,
+      "attrs": {
+        "common": "cathode"
+      }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "rr",
+      "top": -80,
+      "left": 160,
+      "rotate": 90,
+      "attrs": {
+        "value": "220"
+      }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "rg",
+      "top": -80,
+      "left": 190,
+      "rotate": 90,
+      "attrs": {
+        "value": "220"
+      }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "rb",
+      "top": -80,
+      "left": 220,
+      "rotate": 90,
+      "attrs": {
+        "value": "220"
+      }
+    },
+    {
+      "type": "wokwi-potentiometer",
+      "id": "potR",
+      "top": 250,
+      "left": -40,
+      "attrs": {
+        "value": "1023"
+      }
+    },
+    {
+      "type": "wokwi-potentiometer",
+      "id": "potG",
+      "top": 250,
+      "left": 60,
+      "attrs": {
+        "value": "512"
+      }
+    },
+    {
+      "type": "wokwi-potentiometer",
+      "id": "potB",
+      "top": 250,
+      "left": 160,
+      "attrs": {
+        "value": "0"
+      }
+    }
+  ],
+  "connections": [
+    [
+      "rgb:R",
+      "rr:1",
+      "red",
+      [
+        "v0"
+      ]
+    ],
+    [
+      "rgb:G",
+      "rg:1",
+      "green",
+      [
+        "v0"
+      ]
+    ],
+    [
+      "rgb:B",
+      "rb:1",
+      "blue",
+      [
+        "v0"
+      ]
+    ],
+    [
+      "rgb:COM",
+      "uno:GND.1",
+      "black",
+      [
+        "v0"
+      ]
+    ],
+    [
+      "rr:2",
+      "uno:9",
+      "red",
+      [
+        "v0"
+      ]
+    ],
+    [
+      "rg:2",
+      "uno:10",
+      "green",
+      [
+        "v0"
+      ]
+    ],
+    [
+      "rb:2",
+      "uno:11",
+      "blue",
+      [
+        "v0"
+      ]
+    ],
+    [
+      "potR:SIG",
+      "uno:A0",
+      "orange",
+      [
+        "v0"
+      ]
+    ],
+    [
+      "potR:VCC",
+      "uno:5V",
+      "red",
+      [
+        "v0"
+      ]
+    ],
+    [
+      "potR:GND",
+      "uno:GND.2",
+      "black",
+      [
+        "v0"
+      ]
+    ],
+    [
+      "potG:SIG",
+      "uno:A1",
+      "orange",
+      [
+        "v0"
+      ]
+    ],
+    [
+      "potG:VCC",
+      "uno:5V",
+      "red",
+      [
+        "v0"
+      ]
+    ],
+    [
+      "potG:GND",
+      "uno:GND.2",
+      "black",
+      [
+        "v0"
+      ]
+    ],
+    [
+      "potB:SIG",
+      "uno:A2",
+      "orange",
+      [
+        "v0"
+      ]
+    ],
+    [
+      "potB:VCC",
+      "uno:5V",
+      "red",
+      [
+        "v0"
+      ]
+    ],
+    [
+      "potB:GND",
+      "uno:GND.2",
+      "black",
+      [
+        "v0"
+      ]
+    ]
+  ],
+  "dependencies": {}
+}

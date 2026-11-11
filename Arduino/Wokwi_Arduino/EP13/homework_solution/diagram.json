@@ -1,0 +1,131 @@
+{
+  "version": 1,
+  "author": "ChinarSoft",
+  "editor": "wokwi",
+  "parts": [
+    {
+      "type": "wokwi-arduino-uno",
+      "id": "uno",
+      "top": 0,
+      "left": 0,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-a4988",
+      "id": "drv1",
+      "top": -140,
+      "left": 110,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-stepper-motor",
+      "id": "stepper1",
+      "top": -215,
+      "left": 230,
+      "attrs": {
+        "size": "17"
+      }
+    },
+    {
+      "type": "wokwi-pushbutton",
+      "id": "btn",
+      "top": -120,
+      "left": -90,
+      "attrs": {
+        "color": "red",
+        "label": "QUARTER"
+      }
+    }
+  ],
+  "connections": [
+    [
+      "drv1:STEP",
+      "uno:3",
+      "green",
+      [
+        "v0"
+      ]
+    ],
+    [
+      "drv1:DIR",
+      "uno:2",
+      "blue",
+      [
+        "v0"
+      ]
+    ],
+    [
+      "drv1:SLEEP",
+      "drv1:RESET",
+      "green",
+      [
+        "v0"
+      ]
+    ],
+    [
+      "drv1:2B",
+      "stepper1:A-",
+      "green",
+      [
+        "v0"
+      ]
+    ],
+    [
+      "drv1:2A",
+      "stepper1:A+",
+      "green",
+      [
+        "v0"
+      ]
+    ],
+    [
+      "drv1:1A",
+      "stepper1:B+",
+      "green",
+      [
+        "v0"
+      ]
+    ],
+    [
+      "drv1:1B",
+      "stepper1:B-",
+      "green",
+      [
+        "v0"
+      ]
+    ],
+    [
+      "drv1:VDD",
+      "uno:5V",
+      "red",
+      [
+        "v0"
+      ]
+    ],
+    [
+      "drv1:GND.1",
+      "uno:GND.1",
+      "black",
+      [
+        "v0"
+      ]
+    ],
+    [
+      "btn:1.r",
+      "uno:4",
+      "green",
+      [
+        "v0"
+      ]
+    ],
+    [
+      "btn:2.r",
+      "uno:GND.1",
+      "black",
+      [
+        "v0"
+      ]
+    ]
+  ],
+  "dependencies": {}
+}

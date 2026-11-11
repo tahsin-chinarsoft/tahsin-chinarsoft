@@ -1,0 +1,175 @@
+{
+  "version": 1,
+  "author": "ChinarSoft",
+  "editor": "wokwi",
+  "parts": [
+    {
+      "type": "wokwi-arduino-uno",
+      "id": "uno",
+      "top": 0,
+      "left": 0,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-led",
+      "id": "ledR",
+      "top": -150,
+      "left": 150,
+      "attrs": {
+        "color": "red",
+        "label": "RED"
+      }
+    },
+    {
+      "type": "wokwi-led",
+      "id": "ledY",
+      "top": -150,
+      "left": 200,
+      "attrs": {
+        "color": "yellow",
+        "label": "YELLOW"
+      }
+    },
+    {
+      "type": "wokwi-led",
+      "id": "ledG",
+      "top": -150,
+      "left": 250,
+      "attrs": {
+        "color": "limegreen",
+        "label": "GREEN"
+      }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "rR",
+      "top": -72,
+      "left": 139,
+      "rotate": 90,
+      "attrs": {
+        "value": "220"
+      }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "rY",
+      "top": -72,
+      "left": 189,
+      "rotate": 90,
+      "attrs": {
+        "value": "220"
+      }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "rG",
+      "top": -72,
+      "left": 239,
+      "rotate": 90,
+      "attrs": {
+        "value": "220"
+      }
+    },
+    {
+      "type": "wokwi-pushbutton",
+      "id": "btn",
+      "top": -110,
+      "left": -90,
+      "attrs": {
+        "color": "blue",
+        "label": "WALK"
+      }
+    }
+  ],
+  "connections": [
+    [
+      "uno:12",
+      "rR:2",
+      "green",
+      [
+        "v0"
+      ]
+    ],
+    [
+      "rR:1",
+      "ledR:A",
+      "green",
+      [
+        "v0"
+      ]
+    ],
+    [
+      "ledR:C",
+      "uno:GND.1",
+      "black",
+      [
+        "v0"
+      ]
+    ],
+    [
+      "uno:11",
+      "rY:2",
+      "green",
+      [
+        "v0"
+      ]
+    ],
+    [
+      "rY:1",
+      "ledY:A",
+      "green",
+      [
+        "v0"
+      ]
+    ],
+    [
+      "ledY:C",
+      "uno:GND.1",
+      "black",
+      [
+        "v0"
+      ]
+    ],
+    [
+      "uno:10",
+      "rG:2",
+      "green",
+      [
+        "v0"
+      ]
+    ],
+    [
+      "rG:1",
+      "ledG:A",
+      "green",
+      [
+        "v0"
+      ]
+    ],
+    [
+      "ledG:C",
+      "uno:GND.1",
+      "black",
+      [
+        "v0"
+      ]
+    ],
+    [
+      "btn:1.r",
+      "uno:2",
+      "blue",
+      [
+        "v0"
+      ]
+    ],
+    [
+      "btn:2.r",
+      "uno:GND.1",
+      "black",
+      [
+        "v0"
+      ]
+    ]
+  ],
+  "dependencies": {}
+}

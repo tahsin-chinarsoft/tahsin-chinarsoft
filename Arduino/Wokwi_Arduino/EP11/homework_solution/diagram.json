@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "author": "ChinarSoft",
+  "editor": "wokwi",
+  "parts": [
+    { "type": "wokwi-arduino-uno", "id": "uno", "top": 0, "left": 0, "attrs": {} },
+    { "type": "wokwi-buzzer", "id": "bz1", "top": -120, "left": 150, "attrs": { "volume": "0.1" } }
+  ],
+  "connections": [
+    [ "bz1:1", "uno:GND.1", "black", [ "v0" ] ],
+    [ "bz1:2", "uno:8", "red", [ "v0" ] ]
+  ],
+  "dependencies": {}
+}

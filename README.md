@@ -11,6 +11,8 @@ This is where I share the code from my videos, so you can build the projects you
 |---|---|
 | [lego-vision-inspection](https://github.com/tahsin-chinarsoft/lego-vision-inspection) | Two-station assembly line vision inspection with LEGO, a webcam and OpenCV |
 | [Arduino Sensor Kit Tutorial](Arduino/Arduino_Tutorial) | 21-episode Arduino course: from your first Blink through 37 sensor modules to a WiFi dashboard |
+| [Arduino in Your Browser](Arduino/Wokwi_Arduino) | 20-episode Arduino Uno course in Wokwi: every project runs in your browser, no hardware needed |
+| [Industrial ESP32 with Wokwi](Industrial_Automation/Wokwi_ESP32) | 7-episode industrial ESP32 series in Wokwi: debounce, 4–20 mA, interlocks, Modbus RTU, MQTT, OEE dashboard |
 | [Factory Monitoring series](Industrial_Automation/Factory_Monitoring) | Build a free OEE and downtime monitoring system: Node-RED, InfluxDB, Grafana, episode by episode |
 | [Virtual Machine (Modbus TCP)](Industrial_Automation/Virtual_Machine) | A packaging machine in pure Python that talks Modbus TCP: jams, changeovers, scrap and a true OEE report. No PLC or hardware needed |
 

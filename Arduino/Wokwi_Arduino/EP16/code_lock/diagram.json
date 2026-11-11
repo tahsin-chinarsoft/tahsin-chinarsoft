@@ -1,0 +1,160 @@
+{
+  "version": 1,
+  "author": "ChinarSoft",
+  "editor": "wokwi",
+  "parts": [
+    {
+      "type": "wokwi-arduino-uno",
+      "id": "uno",
+      "top": 0,
+      "left": 0,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-membrane-keypad",
+      "id": "keypad",
+      "top": -330,
+      "left": 40,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-lcd1602",
+      "id": "lcd",
+      "top": 260,
+      "left": 20,
+      "attrs": {
+        "pins": "i2c"
+      }
+    },
+    {
+      "type": "wokwi-servo",
+      "id": "servo",
+      "top": -200,
+      "left": -250,
+      "attrs": {}
+    }
+  ],
+  "connections": [
+    [
+      "keypad:R1",
+      "uno:9",
+      "orange",
+      [
+        "v0"
+      ]
+    ],
+    [
+      "keypad:R2",
+      "uno:8",
+      "orange",
+      [
+        "v0"
+      ]
+    ],
+    [
+      "keypad:R3",
+      "uno:7",
+      "orange",
+      [
+        "v0"
+      ]
+    ],
+    [
+      "keypad:R4",
+      "uno:6",
+      "orange",
+      [
+        "v0"
+      ]
+    ],
+    [
+      "keypad:C1",
+      "uno:5",
+      "purple",
+      [
+        "v0"
+      ]
+    ],
+    [
+      "keypad:C2",
+      "uno:4",
+      "purple",
+      [
+        "v0"
+      ]
+    ],
+    [
+      "keypad:C3",
+      "uno:3",
+      "purple",
+      [
+        "v0"
+      ]
+    ],
+    [
+      "keypad:C4",
+      "uno:2",
+      "purple",
+      [
+        "v0"
+      ]
+    ],
+    [
+      "lcd:GND",
+      "uno:GND.2",
+      "black",
+      [
+        "v0"
+      ]
+    ],
+    [
+      "lcd:VCC",
+      "uno:5V",
+      "red",
+      [
+        "v0"
+      ]
+    ],
+    [
+      "lcd:SDA",
+      "uno:A4",
+      "green",
+      [
+        "v0"
+      ]
+    ],
+    [
+      "lcd:SCL",
+      "uno:A5",
+      "blue",
+      [
+        "v0"
+      ]
+    ],
+    [
+      "servo:PWM",
+      "uno:10",
+      "yellow",
+      [
+        "v0"
+      ]
+    ],
+    [
+      "servo:V+",
+      "uno:5V",
+      "red",
+      [
+        "v0"
+      ]
+    ],
+    [
+      "servo:GND",
+      "uno:GND.1",
+      "black",
+      [
+        "v0"
+      ]
+    ]
+  ],
+  "dependencies": {}
+}
