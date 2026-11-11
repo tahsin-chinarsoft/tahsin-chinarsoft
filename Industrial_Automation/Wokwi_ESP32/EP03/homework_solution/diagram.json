@@ -1,0 +1,429 @@
+{
+  "version": 1,
+  "author": "ChinarSoft",
+  "editor": "wokwi",
+  "parts": [
+    {
+      "type": "board-esp32-devkit-c-v4",
+      "id": "esp",
+      "top": 0,
+      "left": 260,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-led",
+      "id": "ledRed",
+      "top": 10,
+      "left": 440,
+      "attrs": {
+        "color": "red",
+        "label": "FAULT"
+      }
+    },
+    {
+      "type": "wokwi-led",
+      "id": "ledYellow",
+      "top": 60,
+      "left": 440,
+      "attrs": {
+        "color": "yellow",
+        "label": "IDLE"
+      }
+    },
+    {
+      "type": "wokwi-led",
+      "id": "ledGreen",
+      "top": 110,
+      "left": 440,
+      "attrs": {
+        "color": "green",
+        "label": "RUN"
+      }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "rRed",
+      "top": 55,
+      "left": 480,
+      "rotate": 0,
+      "attrs": {
+        "value": "220"
+      }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "rYellow",
+      "top": 105,
+      "left": 480,
+      "rotate": 0,
+      "attrs": {
+        "value": "220"
+      }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "rGreen",
+      "top": 155,
+      "left": 480,
+      "rotate": 0,
+      "attrs": {
+        "value": "220"
+      }
+    },
+    {
+      "type": "wokwi-buzzer",
+      "id": "buzzer",
+      "top": -10,
+      "left": 540,
+      "attrs": {
+        "volume": "0.2"
+      }
+    },
+    {
+      "type": "wokwi-lcd1602",
+      "id": "lcd",
+      "top": 200,
+      "left": 420,
+      "attrs": {
+        "pins": "i2c"
+      }
+    },
+    {
+      "type": "wokwi-pushbutton",
+      "id": "btnStart",
+      "top": 30,
+      "left": 0,
+      "attrs": {
+        "color": "green",
+        "label": "START",
+        "key": "s"
+      }
+    },
+    {
+      "type": "wokwi-pushbutton",
+      "id": "btnStop",
+      "top": 30,
+      "left": 110,
+      "attrs": {
+        "color": "red",
+        "label": "STOP",
+        "key": "x"
+      }
+    },
+    {
+      "type": "wokwi-pushbutton",
+      "id": "btnReset",
+      "top": 110,
+      "left": 0,
+      "attrs": {
+        "color": "blue",
+        "label": "RESET",
+        "key": "r"
+      }
+    },
+    {
+      "type": "wokwi-pushbutton",
+      "id": "btnJam",
+      "top": 110,
+      "left": 110,
+      "attrs": {
+        "color": "yellow",
+        "label": "JAM",
+        "key": "j"
+      }
+    },
+    {
+      "type": "wokwi-slide-switch",
+      "id": "swMaterial",
+      "top": 195,
+      "left": 40,
+      "attrs": {
+        "value": "0"
+      }
+    },
+    {
+      "type": "wokwi-pushbutton",
+      "id": "btnPart",
+      "top": 290,
+      "left": 40,
+      "attrs": {
+        "color": "white",
+        "label": "PART",
+        "key": "p"
+      }
+    },
+    {
+      "type": "wokwi-ntc-temperature-sensor",
+      "id": "ntc",
+      "top": 360,
+      "left": 180,
+      "attrs": {
+        "temperature": "40"
+      }
+    },
+    {
+      "type": "wokwi-potentiometer",
+      "id": "potPressure",
+      "top": 350,
+      "left": 330,
+      "attrs": {
+        "value": "614"
+      }
+    },
+    {
+      "type": "wokwi-slide-switch",
+      "id": "swNoise",
+      "top": 395,
+      "left": 20,
+      "attrs": {
+        "value": "0"
+      }
+    },
+    {
+      "type": "wokwi-slide-switch",
+      "id": "swSmart",
+      "top": 395,
+      "left": 100,
+      "attrs": {
+        "value": "0"
+      }
+    }
+  ],
+  "connections": [
+    [
+      "esp:TX",
+      "$serialMonitor:RX",
+      "",
+      []
+    ],
+    [
+      "esp:RX",
+      "$serialMonitor:TX",
+      "",
+      []
+    ],
+    [
+      "esp:18",
+      "ledGreen:A",
+      "green",
+      []
+    ],
+    [
+      "esp:19",
+      "ledYellow:A",
+      "gold",
+      []
+    ],
+    [
+      "esp:23",
+      "ledRed:A",
+      "red",
+      []
+    ],
+    [
+      "ledGreen:C",
+      "rGreen:1",
+      "black",
+      []
+    ],
+    [
+      "ledYellow:C",
+      "rYellow:1",
+      "black",
+      []
+    ],
+    [
+      "ledRed:C",
+      "rRed:1",
+      "black",
+      []
+    ],
+    [
+      "rGreen:2",
+      "esp:GND.2",
+      "black",
+      []
+    ],
+    [
+      "rYellow:2",
+      "esp:GND.2",
+      "black",
+      []
+    ],
+    [
+      "rRed:2",
+      "esp:GND.2",
+      "black",
+      []
+    ],
+    [
+      "esp:32",
+      "buzzer:2",
+      "orange",
+      []
+    ],
+    [
+      "buzzer:1",
+      "esp:GND.2",
+      "black",
+      []
+    ],
+    [
+      "lcd:GND",
+      "esp:GND.3",
+      "black",
+      []
+    ],
+    [
+      "lcd:VCC",
+      "esp:5V",
+      "red",
+      []
+    ],
+    [
+      "lcd:SDA",
+      "esp:21",
+      "blue",
+      []
+    ],
+    [
+      "lcd:SCL",
+      "esp:22",
+      "purple",
+      []
+    ],
+    [
+      "esp:25",
+      "btnStart:1.r",
+      "green",
+      []
+    ],
+    [
+      "esp:26",
+      "btnStop:1.r",
+      "red",
+      []
+    ],
+    [
+      "esp:27",
+      "btnReset:1.r",
+      "blue",
+      []
+    ],
+    [
+      "esp:14",
+      "btnJam:1.r",
+      "gold",
+      []
+    ],
+    [
+      "btnStart:2.r",
+      "esp:GND.1",
+      "black",
+      []
+    ],
+    [
+      "btnStop:2.r",
+      "esp:GND.1",
+      "black",
+      []
+    ],
+    [
+      "btnReset:2.r",
+      "esp:GND.1",
+      "black",
+      []
+    ],
+    [
+      "btnJam:2.r",
+      "esp:GND.1",
+      "black",
+      []
+    ],
+    [
+      "esp:13",
+      "swMaterial:2",
+      "white",
+      []
+    ],
+    [
+      "swMaterial:1",
+      "esp:GND.1",
+      "black",
+      []
+    ],
+    [
+      "esp:33",
+      "btnPart:1.r",
+      "white",
+      []
+    ],
+    [
+      "btnPart:2.r",
+      "esp:GND.1",
+      "black",
+      []
+    ],
+    [
+      "ntc:VCC",
+      "esp:3V3",
+      "red",
+      []
+    ],
+    [
+      "ntc:GND",
+      "esp:GND.1",
+      "black",
+      []
+    ],
+    [
+      "ntc:OUT",
+      "esp:34",
+      "orange",
+      []
+    ],
+    [
+      "potPressure:VCC",
+      "esp:3V3",
+      "red",
+      []
+    ],
+    [
+      "potPressure:GND",
+      "esp:GND.1",
+      "black",
+      []
+    ],
+    [
+      "potPressure:SIG",
+      "esp:35",
+      "cyan",
+      []
+    ],
+    [
+      "esp:16",
+      "swNoise:2",
+      "magenta",
+      []
+    ],
+    [
+      "swNoise:1",
+      "esp:GND.1",
+      "black",
+      []
+    ],
+    [
+      "esp:17",
+      "swSmart:2",
+      "limegreen",
+      []
+    ],
+    [
+      "swSmart:1",
+      "esp:GND.1",
+      "black",
+      []
+    ]
+  ],
+  "dependencies": {}
+}

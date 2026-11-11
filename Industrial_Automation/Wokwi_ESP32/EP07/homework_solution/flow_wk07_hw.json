@@ -1,0 +1,277 @@
+[
+ {
+  "id": "wk07hw00",
+  "type": "tab",
+  "label": "ESP32 × 2 → OEE (Ep 7 homework)",
+  "disabled": false,
+  "info": "Homework solution: two Wokwi tabs = two machines. Put each tab's ID into one MQTT node pair. The adapter keeps its memory per device, so nothing else changes."
+ },
+ {
+  "id": "wk07hwbrk",
+  "type": "mqtt-broker",
+  "name": "public broker",
+  "broker": "broker.hivemq.com",
+  "port": "1883",
+  "clientid": "",
+  "autoConnect": true,
+  "usetls": false,
+  "protocolVersion": "4",
+  "keepalive": "30",
+  "cleansession": true,
+  "autoUnsubscribe": true,
+  "birthTopic": "",
+  "closeTopic": "",
+  "willTopic": ""
+ },
+ {
+  "id": "wk07hwc1",
+  "type": "comment",
+  "z": "wk07hw00",
+  "name": "One MQTT node per Wokwi tab (device ID). Same adapter for both.",
+  "info": "",
+  "x": 420,
+  "y": 40,
+  "wires": []
+ },
+ {
+  "id": "wk07hwfn1",
+  "type": "function",
+  "z": "wk07hw00",
+  "name": "ESP32 JSON → machine rows",
+  "func": "// One ESP32 message -> rows for the SAME 'machine' table the Factory Monitoring dashboard reads.\n// The ESP32 sends running totals (seconds in each state). We write only what changed.\nconst p  = msg.payload;                        // parsed JSON from the ESP32\nconst id = msg.topic.split('/')[2];            // chinarsoft/demo/<id>/state\nconst STATES  = ['STOPPED', 'RUNNING', 'IDLE', 'FAULT'];\nconst REASONS = { 0: '-', 1: 'material shortage', 2: 'jam', 3: 'motor overload',\n                  4: 'sensor fault', 9: 'guard open' };\n// Your plant decides this table: which time is planned, which time costs OEE.\nconst BUCKET = { t_run: 'run', t_stop: 'planned', t_idle: 'unplanned', t_fault: 'unplanned' };\n\nconst mem = context.get(id) || { last: null, goodOff: 0, scrapOff: 0 };\nconst last = mem.last;\nmem.last = p;\nif (!last) { context.set(id, mem); node.status({ fill: 'grey', shape: 'dot', text: id + ': first message' }); return null; }\n\n// counters only go up - unless the ESP32 rebooted. Then the new value IS the delta.\nconst delta = (now, before) => now >= before ? now - before : now;\nif (p.good  < last.good)  mem.goodOff  += last.good;\nif (p.scrap < last.scrap) mem.scrapOff += last.scrap;\ncontext.set(id, mem);\n\nconst add = {};\nfor (const [key, bucket] of Object.entries(BUCKET)) {\n    const dt = delta(p[key], last[key]);\n    if (dt > 0) add[bucket] = (add[bucket] || 0) + dt;\n}\nconst state = STATES[p.state] ?? 'UNKNOWN';\nconst now = state === 'RUNNING' ? 'run' : BUCKET['t_' + { STOPPED: 'stop', IDLE: 'idle', FAULT: 'fault' }[state]];\nif (!Object.keys(add).length) add[now] = 0;   // still write a row: the state timeline needs every change\n\nconst reason = REASONS[p.reason] ?? String(p.reason);\nconst good = p.good + mem.goodOff, scrap = p.scrap + mem.scrapOff;\nconst ts = Date.now();\nmsg.payload = Object.entries(add).map(([bucket, dt]) =>\n    `machine,line=esp32,device=${id},bucket=${bucket} ` +\n    `state=\"${state}\",reason=\"${reason}\",good=${good}i,scrap=${scrap}i,` +\n    `cycle=${p.cycle_s},temp=${p.temp_c},dt=${dt}i ${ts}`).join('\\n');\nnode.status({ fill: state === 'RUNNING' ? 'green' : 'yellow', shape: 'dot',\n              text: `${state} · good ${good} · scrap ${scrap}` });\nreturn msg;\n",
+  "outputs": 1,
+  "timeout": 0,
+  "noerr": 0,
+  "initialize": "",
+  "finalize": "",
+  "libs": [],
+  "x": 440,
+  "y": 160,
+  "wires": [
+   [
+    "wk07hwfn2",
+    "wk07hwdbg"
+   ]
+  ]
+ },
+ {
+  "id": "wk07hwfn2",
+  "type": "function",
+  "z": "wk07hw00",
+  "name": "InfluxDB write request",
+  "func": "// POST line protocol to InfluxDB 3 Core (same as Factory Monitoring)\nmsg.method  = 'POST';\nmsg.url     = `${env.get('INFLUX_URL') || 'http://127.0.0.1:8181'}/api/v3/write_lp?db=factory&precision=ms`;\nmsg.headers = { 'Authorization': 'Bearer ' + env.get('INFLUX_TOKEN'), 'Content-Type': 'text/plain' };\nreturn msg;\n",
+  "outputs": 1,
+  "timeout": 0,
+  "noerr": 0,
+  "initialize": "",
+  "finalize": "",
+  "libs": [],
+  "x": 710,
+  "y": 160,
+  "wires": [
+   [
+    "wk07hwhttp"
+   ]
+  ]
+ },
+ {
+  "id": "wk07hwhttp",
+  "type": "http request",
+  "z": "wk07hw00",
+  "name": "Write to InfluxDB",
+  "method": "use",
+  "ret": "txt",
+  "paytoqs": "ignore",
+  "url": "",
+  "tls": "",
+  "persist": true,
+  "proxy": "",
+  "insecureHTTPParser": false,
+  "authType": "",
+  "senderr": false,
+  "headers": [],
+  "x": 930,
+  "y": 160,
+  "wires": [
+   [
+    "wk07hwsw"
+   ]
+  ]
+ },
+ {
+  "id": "wk07hwsw",
+  "type": "switch",
+  "z": "wk07hw00",
+  "name": "write failed?",
+  "property": "statusCode",
+  "propertyType": "msg",
+  "rules": [
+   {
+    "t": "gte",
+    "v": "300",
+    "vt": "num"
+   }
+  ],
+  "checkall": "true",
+  "repair": false,
+  "outputs": 1,
+  "x": 1110,
+  "y": 160,
+  "wires": [
+   [
+    "wk07hwdbg3"
+   ]
+  ]
+ },
+ {
+  "id": "wk07hwdbg3",
+  "type": "debug",
+  "z": "wk07hw00",
+  "name": "InfluxDB errors",
+  "active": true,
+  "tosidebar": true,
+  "console": false,
+  "tostatus": true,
+  "complete": "payload",
+  "targetType": "msg",
+  "statusVal": "statusCode",
+  "statusType": "msg",
+  "x": 1290,
+  "y": 160,
+  "wires": []
+ },
+ {
+  "id": "wk07hwdbg",
+  "type": "debug",
+  "z": "wk07hw00",
+  "name": "line protocol",
+  "active": true,
+  "tosidebar": true,
+  "console": false,
+  "tostatus": false,
+  "complete": "payload",
+  "targetType": "msg",
+  "x": 700,
+  "y": 240,
+  "wires": []
+ },
+ {
+  "id": "wk07hwin0",
+  "type": "mqtt in",
+  "z": "wk07hw00",
+  "name": "Machine A state",
+  "topic": "chinarsoft/demo/MACHINE_A_ID/state",
+  "qos": "1",
+  "datatype": "json",
+  "broker": "wk07hwbrk",
+  "nl": false,
+  "rap": true,
+  "rh": 0,
+  "inputs": 0,
+  "x": 150,
+  "y": 120,
+  "wires": [
+   [
+    "wk07hwfn1"
+   ]
+  ]
+ },
+ {
+  "id": "wk07hwin1",
+  "type": "mqtt in",
+  "z": "wk07hw00",
+  "name": "Machine B state",
+  "topic": "chinarsoft/demo/MACHINE_B_ID/state",
+  "qos": "1",
+  "datatype": "json",
+  "broker": "wk07hwbrk",
+  "nl": false,
+  "rap": true,
+  "rh": 0,
+  "inputs": 0,
+  "x": 150,
+  "y": 200,
+  "wires": [
+   [
+    "wk07hwfn1"
+   ]
+  ]
+ },
+ {
+  "id": "wk07hwfn3",
+  "type": "function",
+  "z": "wk07hw00",
+  "name": "online / offline",
+  "func": "// online / offline: the ESP32's last will, published by the broker when the device vanishes\nconst id = msg.topic.split('/')[2];\nconst on = msg.payload === 'online';\nnode.status({ fill: on ? 'green' : 'red', shape: on ? 'dot' : 'ring', text: `${id}: ${msg.payload}` });\nreturn msg;\n",
+  "outputs": 1,
+  "timeout": 0,
+  "noerr": 0,
+  "initialize": "",
+  "finalize": "",
+  "libs": [],
+  "x": 440,
+  "y": 340,
+  "wires": [
+   [
+    "wk07hwdbg4"
+   ]
+  ]
+ },
+ {
+  "id": "wk07hwdbg4",
+  "type": "debug",
+  "z": "wk07hw00",
+  "name": "link",
+  "active": true,
+  "tosidebar": true,
+  "console": false,
+  "tostatus": false,
+  "complete": "payload",
+  "targetType": "msg",
+  "x": 620,
+  "y": 340,
+  "wires": []
+ },
+ {
+  "id": "wk07hwst0",
+  "type": "mqtt in",
+  "z": "wk07hw00",
+  "name": "Machine A status",
+  "topic": "chinarsoft/demo/MACHINE_A_ID/status",
+  "qos": "1",
+  "datatype": "utf8",
+  "broker": "wk07hwbrk",
+  "nl": false,
+  "rap": true,
+  "rh": 0,
+  "inputs": 0,
+  "x": 170,
+  "y": 320,
+  "wires": [
+   [
+    "wk07hwfn3"
+   ]
+  ]
+ },
+ {
+  "id": "wk07hwst1",
+  "type": "mqtt in",
+  "z": "wk07hw00",
+  "name": "Machine B status",
+  "topic": "chinarsoft/demo/MACHINE_B_ID/status",
+  "qos": "1",
+  "datatype": "utf8",
+  "broker": "wk07hwbrk",
+  "nl": false,
+  "rap": true,
+  "rh": 0,
+  "inputs": 0,
+  "x": 170,
+  "y": 360,
+  "wires": [
+   [
+    "wk07hwfn3"
+   ]
+  ]
+ }
+]
