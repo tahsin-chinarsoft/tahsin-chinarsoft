@@ -3,7 +3,7 @@
 Install Node-RED and the Mosquitto MQTT broker natively on Windows, fix the **"local only mode"** trap
 that stops your ESP32 or PLC gateway from connecting, and finish with a live Node-RED Dashboard 2.0.
 
-📺 Video: *Install It Right #3* on [ChinarSoft](https://www.youtube.com/@ChinarSoft)
+▶ Video: [Why Can't My ESP32 Connect to Mosquitto? Node-RED + MQTT on Windows](https://youtu.be/BBT5a6pQRPU) · Short: [My MQTT broker worked... only on localhost](https://youtube.com/shorts/k87I5ppWpuo)
 
 ## Tested with
 
