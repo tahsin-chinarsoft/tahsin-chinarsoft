@@ -2,7 +2,7 @@
 
 ChinarSoft YouTube video: install Ultralytics YOLO26 on a Jetson Orin Nano Super running JetPack 7.2, from an empty terminal to TensorRT. Recorded during a real first install, including every error.
 
-▶ Video: _coming soon_
+▶ Video: [YOLO26 on Jetson Orin Nano (JetPack 7.2): 23 ms → 3.5 ms with TensorRT](https://youtu.be/0UxXNWHBBHg) · Short: [CUDA True, wrong PyTorch](https://youtube.com/shorts/rElUG5Ex-cA)
 
 ## Results
 
@@ -81,7 +81,7 @@ python benchmark.py
 Notes:
 
 - Don't trust `torch.cuda.is_available()` alone. Check `torch.cuda.get_device_capability(0)` is `(8, 7)` and that no warning is printed.
-- The `onnxruntime-gpu` 1.24.0 wheel suggested for JetPack 7 is built for SBSA (sm_90), not Orin. It is not needed for TensorRT export, so this guide skips it.
+- You don't need to install `onnxruntime-gpu` yourself. The 1.24.0 wheel suggested for JetPack 7 is built for SBSA (sm_90), not Orin. During `yolo export ... format=engine`, Ultralytics auto-installs what it needs (onnx, onnxslim, onnxruntime-gpu, tensorrt-cu13); in our test the export and TensorRT inference worked with those.
 - A TensorRT engine belongs to the device that built it. Rebuild it on every Jetson.
 
 ## Files
