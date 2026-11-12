@@ -3,7 +3,7 @@
 Install InfluxDB 3 Core and Grafana natively on Windows, get past the three Windows traps,
 and finish with a live machine dashboard.
 
-▶ Video: coming soon on [ChinarSoft](https://www.youtube.com/@chinarsoft)
+▶ Video: [InfluxDB 3 + Grafana on Windows (No Docker): "Not Authenticated" Is Normal](https://youtu.be/Y-zstveEgo8) · Short: [InfluxDB 3 says "Not Authenticated"... that's normal](https://youtube.com/shorts/9J7VafIScpg)
 
 ## Tested with
 
