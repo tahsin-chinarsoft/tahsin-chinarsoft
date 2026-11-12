@@ -15,6 +15,7 @@ This is where I share the code from my videos, so you can build the projects you
 | [Industrial ESP32 with Wokwi](Industrial_Automation/Wokwi_ESP32) | 7-episode industrial ESP32 series in Wokwi: debounce, 4–20 mA, interlocks, Modbus RTU, MQTT, OEE dashboard |
 | [Factory Monitoring series](Industrial_Automation/Factory_Monitoring) | Build a free OEE and downtime monitoring system: Node-RED, InfluxDB, Grafana, episode by episode |
 | [Node-RED + Mosquitto MQTT on Windows](Industrial_Automation/NodeRED_MQTT_Windows) | Native Windows install (no Docker), the Mosquitto "local only mode" trap and its fix, and a live Node-RED Dashboard 2.0 |
+| [InfluxDB 3 + Grafana on Windows](Industrial_Automation/InfluxDB3_Grafana_Windows) | Native Windows install (no Docker): the "not authenticated" screen, the PowerShell token trap, Grafana's TLS error, and a live dashboard |
 | [YOLO26 on Jetson (JetPack 7.2)](Jetson/YOLO26_Install) | Install YOLO26 on a Jetson Orin Nano with JetPack 7.2 and TensorRT: 23 ms → 3.5 ms, plus the PyTorch fix for Orin |
 | [Virtual Machine (Modbus TCP)](Industrial_Automation/Virtual_Machine) | A packaging machine in pure Python that talks Modbus TCP: jams, changeovers, scrap and a true OEE report. No PLC or hardware needed |
 
