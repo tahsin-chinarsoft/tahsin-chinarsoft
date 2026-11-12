@@ -1,0 +1,184 @@
+[
+  {
+    "id": "dash_base",
+    "type": "ui-base",
+    "name": "Dashboard",
+    "path": "/dashboard",
+    "includeClientData": true,
+    "acceptsClientConfig": [
+      "ui-notification",
+      "ui-control"
+    ],
+    "showPathInSidebar": false,
+    "navigationStyle": "default"
+  },
+  {
+    "id": "dash_theme",
+    "type": "ui-theme",
+    "name": "Default",
+    "colors": {
+      "surface": "#ffffff",
+      "primary": "#0094CE",
+      "bgPage": "#eeeeee",
+      "groupBg": "#ffffff",
+      "groupOutline": "#cccccc"
+    },
+    "sizes": {
+      "pagePadding": "12px",
+      "groupGap": "12px",
+      "groupBorderRadius": "4px",
+      "widgetGap": "12px"
+    }
+  },
+  {
+    "id": "dash_page",
+    "type": "ui-page",
+    "name": "Line 1",
+    "ui": "dash_base",
+    "path": "/line1",
+    "layout": "grid",
+    "theme": "dash_theme",
+    "order": 1,
+    "visible": "true",
+    "disabled": "false"
+  },
+  {
+    "id": "dash_group",
+    "type": "ui-group",
+    "name": "Machine 1 (MQTT)",
+    "page": "dash_page",
+    "width": "6",
+    "height": "1",
+    "order": 1,
+    "showTitle": true,
+    "visible": "true",
+    "disabled": "false"
+  },
+  {
+    "id": "dash_in",
+    "type": "mqtt in",
+    "z": "mqttlab_tab",
+    "name": "",
+    "topic": "factory/line1/data",
+    "qos": "0",
+    "datatype": "json",
+    "broker": "mqttlab_broker",
+    "nl": false,
+    "rap": true,
+    "rh": 0,
+    "inputs": 0,
+    "x": 150,
+    "y": 260,
+    "wires": [
+      [
+        "dash_split"
+      ]
+    ]
+  },
+  {
+    "id": "dash_split",
+    "type": "function",
+    "z": "mqttlab_tab",
+    "name": "split fields",
+    "func": "return [{payload: msg.payload.temp},{payload: msg.payload.state},{payload: msg.payload.parts, topic:\"parts\"}];",
+    "outputs": 3,
+    "x": 350,
+    "y": 260,
+    "wires": [
+      [
+        "dash_gauge"
+      ],
+      [
+        "dash_text"
+      ],
+      [
+        "dash_chart"
+      ]
+    ]
+  },
+  {
+    "id": "dash_gauge",
+    "type": "ui-gauge",
+    "z": "mqttlab_tab",
+    "name": "",
+    "group": "dash_group",
+    "order": 1,
+    "width": 3,
+    "height": 3,
+    "gtype": "gauge-half",
+    "gstyle": "needle",
+    "title": "Temperature",
+    "units": "\u00b0C",
+    "icon": "",
+    "prefix": "",
+    "suffix": "",
+    "segments": [
+      {
+        "from": "0",
+        "color": "#5cd65c"
+      },
+      {
+        "from": "60",
+        "color": "#ffc800"
+      },
+      {
+        "from": "63",
+        "color": "#ea5353"
+      }
+    ],
+    "min": "50",
+    "max": "70",
+    "sizeThickness": 16,
+    "sizeGap": 4,
+    "sizeKeyThickness": 8,
+    "styleRounded": true,
+    "styleGlow": false,
+    "x": 560,
+    "y": 220,
+    "wires": []
+  },
+  {
+    "id": "dash_text",
+    "type": "ui-text",
+    "z": "mqttlab_tab",
+    "group": "dash_group",
+    "order": 2,
+    "width": 3,
+    "height": 1,
+    "name": "",
+    "label": "State",
+    "format": "{{msg.payload}}",
+    "layout": "row-spread",
+    "style": false,
+    "font": "",
+    "fontSize": 16,
+    "color": "#717171",
+    "x": 550,
+    "y": 260,
+    "wires": []
+  },
+  {
+    "id": "dash_chart",
+    "type": "ui-chart",
+    "z": "mqttlab_tab",
+    "group": "dash_group",
+    "name": "",
+    "label": "Parts produced",
+    "order": 3,
+    "chartType": "line",
+    "category": "topic",
+    "categoryType": "msg",
+    "xAxisType": "time",
+    "yAxisProperty": "payload",
+    "removeOlder": "10",
+    "removeOlderUnit": "60",
+    "removeOlderPoints": "",
+    "width": 6,
+    "height": 4,
+    "x": 570,
+    "y": 300,
+    "wires": [
+      []
+    ]
+  }
+]

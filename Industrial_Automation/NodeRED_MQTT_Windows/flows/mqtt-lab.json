@@ -1,0 +1,103 @@
+[
+  {
+    "id": "mqttlab_tab",
+    "type": "tab",
+    "label": "MQTT Lab",
+    "disabled": false,
+    "info": "Fake machine -> Mosquitto -> back into Node-RED. Set the broker to your PC's network IP."
+  },
+  {
+    "id": "mqttlab_inject",
+    "type": "inject",
+    "z": "mqttlab_tab",
+    "name": "every 2 s",
+    "props": [],
+    "repeat": "2",
+    "once": true,
+    "onceDelay": "1",
+    "topic": "",
+    "x": 130,
+    "y": 80,
+    "wires": [
+      [
+        "mqttlab_fn"
+      ]
+    ]
+  },
+  {
+    "id": "mqttlab_fn",
+    "type": "function",
+    "z": "mqttlab_tab",
+    "name": "fake machine",
+    "func": "const states = [\"RUNNING\", \"RUNNING\", \"RUNNING\", \"IDLE\", \"FAULT\"];\nconst parts = (context.get(\"parts\") || 0) + Math.floor(Math.random() * 3);\ncontext.set(\"parts\", parts);\nmsg.payload = {\n  state: states[Math.floor(Math.random() * states.length)],\n  parts: parts,\n  temp: +(55 + Math.random() * 10).toFixed(1),\n  ts: Date.now()\n};\nreturn msg;",
+    "outputs": 1,
+    "x": 310,
+    "y": 80,
+    "wires": [
+      [
+        "mqttlab_out"
+      ]
+    ]
+  },
+  {
+    "id": "mqttlab_out",
+    "type": "mqtt out",
+    "z": "mqttlab_tab",
+    "name": "",
+    "topic": "factory/line1/data",
+    "qos": "0",
+    "retain": "false",
+    "broker": "mqttlab_broker",
+    "x": 520,
+    "y": 80,
+    "wires": []
+  },
+  {
+    "id": "mqttlab_in",
+    "type": "mqtt in",
+    "z": "mqttlab_tab",
+    "name": "",
+    "topic": "factory/#",
+    "qos": "0",
+    "datatype": "auto-detect",
+    "broker": "mqttlab_broker",
+    "nl": false,
+    "rap": true,
+    "rh": 0,
+    "inputs": 0,
+    "x": 140,
+    "y": 160,
+    "wires": [
+      [
+        "mqttlab_dbg"
+      ]
+    ]
+  },
+  {
+    "id": "mqttlab_dbg",
+    "type": "debug",
+    "z": "mqttlab_tab",
+    "name": "",
+    "active": true,
+    "tosidebar": true,
+    "complete": "payload",
+    "targetType": "msg",
+    "x": 330,
+    "y": 160,
+    "wires": []
+  },
+  {
+    "id": "mqttlab_broker",
+    "type": "mqtt-broker",
+    "name": "Mosquitto (network IP)",
+    "broker": "192.168.1.100",
+    "port": "1883",
+    "clientid": "",
+    "autoConnect": true,
+    "usetls": false,
+    "protocolVersion": "4",
+    "keepalive": "60",
+    "cleansession": true,
+    "autoUnsubscribe": true
+  }
+]
